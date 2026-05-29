@@ -1481,15 +1481,7 @@
     return seq;
   }
 
-  function nextPage() {
-    const seq = getPageSequence();
-    const idx = seq.indexOf(currentPage);
-    if (idx < seq.length - 1) {
-      showPage(seq[idx + 1]);
-    } else {
-      showSuccess();
-    }
-  }
+
 
   function prevPage() {
     const seq = getPageSequence();
@@ -1536,7 +1528,153 @@
     }
   }
 
-  buildProgress();
+  // ── FORM SUBMISSION ──────────────────────────────────────────
+
+  function getFieldValue(selector) {
+    const el = document.querySelector(selector);
+    return el ? el.value : '';
+  }
+
+  async function submitForm() {
+    const btnNext = document.getElementById('btnNext');
+    btnNext.textContent = 'Sending...';
+    btnNext.disabled = true;
+
+    // Collect contact fields
+    const inputs = document.querySelectorAll('.field-input');
+    const firstName = inputs[0] ? inputs[0].value : '';
+    const lastName  = inputs[1] ? inputs[1].value : '';
+    const email     = inputs[2] ? inputs[2].value : '';
+    const phone     = inputs[3] ? inputs[3].value : '';
+    const street    = inputs[4] ? inputs[4].value : '';
+    const city      = inputs[5] ? inputs[5].value : '';
+    const zip       = inputs[6] ? inputs[6].value : '';
+
+    // Attending toggle
+    const attendingBtn = document.querySelector('.toggle-btn.active');
+    const attending = attendingBtn ? attendingBtn.textContent : 'Not specified';
+
+    // Access notes
+    const accessNotes = inputs[7] ? inputs[7].value : '';
+
+    // Service
+    const serviceCard = document.querySelector('.service-card.selected');
+    const service = serviceCard ? serviceCard.querySelector('.service-name').textContent : 'Not selected';
+
+    // Schedule
+    const dateInput = document.querySelector('input[type="date"]');
+    const scheduledDate = dateInput ? dateInput.value : '';
+    const timeSlot = document.querySelector('.time-slot.selected');
+    const scheduledTime = timeSlot ? timeSlot.textContent : 'Not selected';
+
+    // Special notes
+    const textarea = document.querySelector('textarea');
+    const specialNotes = textarea ? textarea.value : '';
+
+    // Grand total
+    const totalEl = document.getElementById('totalAmount');
+    const grandTotal = totalEl ? totalEl.textContent.replace('$','').replace(',','') : '0';
+
+    const payload = {
+      firstName, lastName, email, phone,
+      street, city, zip, attending, accessNotes,
+      service,
+      photoPrice: prices.photo || 0,
+      videoPrice: prices.video || 0,
+      stagingPrice: prices.staging || 0,
+      floorPrice: prices.floor || 0,
+      tourPrice: prices.tour || 0,
+      addons: addonNames.join(', '),
+      addonTotal: prices.addons || 0,
+      scheduledDate, scheduledTime, specialNotes,
+      grandTotal
+    };
+
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        showSuccess();
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (err) {
+      btnNext.textContent = 'Submit Booking';
+      btnNext.disabled = false;
+      alert('Something went wrong. Please email us directly at cesar@imagestate.homes or call us to complete your booking.');
+    }
+  }
+
+  function nextPage() {
+    const seq = getPageSequence();
+    const idx = seq.indexOf(currentPage);
+    if (currentPage === 11) {
+      submitForm();
+      return;
+    }
+    if (idx < seq.length - 1) {
+      showPage(seq[idx + 1]);
+    }
+  }
+
+  async function submitForm() {
+    const btnNext = document.getElementById('btnNext');
+    btnNext.textContent = 'Sending...';
+    btnNext.disabled = true;
+    const inputs = document.querySelectorAll('.field-input');
+    const firstName = inputs[0] ? inputs[0].value : '';
+    const lastName  = inputs[1] ? inputs[1].value : '';
+    const email     = inputs[2] ? inputs[2].value : '';
+    const phone     = inputs[3] ? inputs[3].value : '';
+    const street    = inputs[4] ? inputs[4].value : '';
+    const city      = inputs[5] ? inputs[5].value : '';
+    const zip       = inputs[6] ? inputs[6].value : '';
+    const attendingBtn = document.querySelector('.toggle-btn.active');
+    const attending = attendingBtn ? attendingBtn.textContent : 'Not specified';
+    const accessNotes = inputs[7] ? inputs[7].value : '';
+    const serviceCard = document.querySelector('.service-card.selected');
+    const service = serviceCard ? serviceCard.querySelector('.service-name').textContent : 'Not selected';
+    const dateInput = document.querySelector('input[type="date"]');
+    const scheduledDate = dateInput ? dateInput.value : '';
+    const timeSlot = document.querySelector('.time-slot.selected');
+    const scheduledTime = timeSlot ? timeSlot.textContent : 'Not selected';
+    const textarea = document.querySelector('textarea');
+    const specialNotes = textarea ? textarea.value : '';
+    const totalEl = document.getElementById('totalAmount');
+    const grandTotal = totalEl ? totalEl.textContent.replace('$','').replace(',','') : '0';
+    const payload = {
+      firstName, lastName, email, phone,
+      street, city, zip, attending, accessNotes, service,
+      photoPrice: prices.photo || 0,
+      videoPrice: prices.video || 0,
+      stagingPrice: prices.staging || 0,
+      floorPrice: prices.floor || 0,
+      tourPrice: prices.tour || 0,
+      addons: addonNames.join(', '),
+      addonTotal: prices.addons || 0,
+      scheduledDate, scheduledTime, specialNotes, grandTotal
+    };
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) { showSuccess(); } 
+      else { throw new Error('Server error'); }
+    } catch (err) {
+      btnNext.textContent = 'Submit Booking';
+      btnNext.disabled = false;
+      alert('Something went wrong. Please email cesar@imagestate.homes to complete your booking.');
+    }
+  }
+
+ 
+  }buildProgress();
   updateNavButtons();
   updateTotal();
 </script>

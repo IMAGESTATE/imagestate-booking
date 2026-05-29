@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMAGESTATE — Book Your Shoot</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a1f3a;
+    --navy-light: #252b4a;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f8f6f1;
+    --white: #ffffff;
+    --gray: #9a9fb0;
+    --gray-light: #eef0f5;
+    --text: #1a1f3a;
+    --success: #4a7c59;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .form-header {
+    background: var(--navy);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 3px;
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .progress-step {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+  }
+
+  .progress-step.active { background: var(--gold); transform: scale(1.3); }
+  .progress-step.done { background: rgba(201,168,76,0.5); }
+
+  /* TOTAL BAR */
+  .total-bar {
+    background: var(--navy-light);
+    padding: 12px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .total-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  .total-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  /* PAGES */
+  .page { display: none; animation: fadeUp 0.4s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px 120px;
+  }
+
+  .page-num {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 300;
+    color: var(--navy);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .page-sub {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  /* FIELDS */
+  .field-group {
+    margin-bottom: 28px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #dde0ea;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .field-input:focus { border-color: var(--navy); }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* SERVICE CARDS */
+  .service-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .service-card {
+    background: var(--white);
+    border: 2px solid #dde0ea;
+    border-radius: 12px;
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+
+  .service-card:hover { border-color: var(--navy); transform: translateY(-1px); }
+  .service-card.selected { border-color: var(--navy); background: #f0f2f8; }
+  .service-card.selected::before { background: var(--navy); }
+  .service-card.luxury { border-color: rgba(201,168,76,0.4); }
+  .service-card.luxury:hover { border-color: var(--gold); }
+  .service-card.luxury.selected { border-color: var(--gold); background: #fdf9ef; }
+  .service-card.luxury.selected::before { background: var(--gold); }
+
+  .service-card-left { flex: 1; }
+
+  .service-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .badge-standard { background: #eef0f5; color: var(--gray); }
+  .badge-premium { background: #e8eaf6; color: #4a5080; }
+  .badge-luxury { background: #fdf3db; color: #8a6a1a; }
+  .badge-bundle { background: #e8f5e9; color: #2e6b3e; }
+
+  .service-name {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .service-desc {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  .service-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 300;
+    color: var(--navy);
+    white-space: nowrap;
+    margin-left: 20px;
+  }
+
+  .service-card.luxury .service-price { color: var(--gold); }
+
+  .check-circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #dde0ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .service-card.selected .check-circle {
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+
+  .service-card.luxury.selected .check-circle {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .check-circle svg { opacity: 0; transition: opacity 0.2s; }
+  .service-card.selected .check-circle svg { opacity: 1; }
+
+  /* PRICING OPTIONS */
+  .pricing-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pricing-option {
+    background: var(--white);
+    border: 1.5px solid #dde0ea;
+    border-radius: 10px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pricing-option:hover { border-color: var(--navy); }
+  .pricing-option.selected { border-color: var(--navy); background: #f0f2f8; }
+  .pricing-option.luxury-option.selected { border-color: var(--gold); background: #fdf9ef; }
+
+  .pricing-left { display: flex; align-items: center; gap: 12px; }
+
+  .radio-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid #dde0ea;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .pricing-option.selected .radio-dot { border-color: var(--navy); }
+  .pricing-option.luxury-option.selected .radio-dot { border-color: var(--gold); }
+
+  .radio-inner {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: transparent;
+    transition: all 0.2s;
+  }
+
+  .pricing-option.selected .radio-inner { background: var(--navy); }
+  .pricing-option.luxury-option.selected .radio-inner { background: var(--gold); }
+
+  .pricing-info {}
+  .pricing-tier {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 2px;
+  }
+
+  .pricing-name { font-size: 15px; font-weight: 500; color: var(--navy); }
+  .pricing-note { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  .pricing-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--navy);
+  }
+
+  .luxury-option .pricing-amount { color: var(--gold); }
+
+  .luxury-note {
+    background: #fdf9ef;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #8a6a1a;
+    line-height: 1.6;
+  }
+
+  /* ADDON GRID */
+  .addon-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .addon-card {
+    background: var(--white);
+    border: 1.5px solid #dde0ea;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .addon-card:hover { border-color: var(--navy); }
+  .addon-card.selected { border-color: var(--navy); background: #f0f2f8; }
+
+  .addon-check {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 2px solid #dde0ea;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+  }
+
+  .addon-card.selected .addon-check { background: var(--navy); border-color: var(--navy); }
+
+  .addon-info { flex: 1; }
+  .addon-name { font-size: 14px; font-weight: 500; color: var(--navy); margin-bottom: 2px; }
+  .addon-desc { font-size: 11px; color: var(--gray); line-height: 1.4; }
+  .addon-price { font-size: 14px; font-weight: 500; color: var(--navy); margin-top: 6px; }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 32px 0 20px;
+  }
+
+  .section-divider-line { flex: 1; height: 1px; background: #dde0ea; }
+  .section-divider-text {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    white-space: nowrap;
+  }
+
+  /* SCHEDULE */
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .time-slot {
+    padding: 12px 8px;
+    text-align: center;
+    border: 1.5px solid #dde0ea;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--navy);
+    transition: all 0.2s;
+    background: var(--white);
+  }
+
+  .time-slot:hover { border-color: var(--navy); }
+  .time-slot.selected { border-color: var(--navy); background: var(--navy); color: var(--white); }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid #dde0ea;
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+  }
+
+  .toggle-btn {
+    padding: 10px 24px;
+    background: var(--white);
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--gray);
+    transition: all 0.2s;
+  }
+
+  .toggle-btn.active { background: var(--navy); color: var(--white); }
+
+  /* NAV BUTTONS */
+  .form-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--white);
+    border-top: 1px solid #dde0ea;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .btn-back {
+    padding: 12px 28px;
+    background: transparent;
+    border: 1.5px solid #dde0ea;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-back:hover { border-color: var(--navy); color: var(--navy); }
+
+  .btn-next {
+    padding: 14px 40px;
+    background: var(--navy);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-next:hover { background: var(--navy-light); transform: translateY(-1px); }
+
+  .btn-submit {
+    padding: 14px 40px;
+    background: var(--gold);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--navy);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* INCLUDES LIST */
+  .includes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .include-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    background: #eef0f5;
+    border-radius: 20px;
+    color: var(--gray);
+  }
+
+  /* REVIEW PAGE */
+  .review-section {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .review-section-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .review-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #eef0f5;
+    font-size: 14px;
+  }
+
+  .review-line:last-child { border-bottom: none; }
+  .review-line-label { color: var(--gray); }
+  .review-line-value { font-weight: 500; text-align: right; }
+
+  .review-total {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .review-total-label {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .review-total-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  .success-page {
+    text-align: center;
+    padding: 80px 24px;
+  }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--success);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .aerial-note {
+    background: var(--navy);
+    color: rgba(255,255,255,0.8);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .aerial-note span { color: var(--gold); font-weight: 500; }
+
+  @media (max-width: 500px) {
+    .addon-grid { grid-template-columns: 1fr; }
+    .field-row { grid-template-columns: 1fr; }
+    .schedule-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-header { padding: 16px; }
+    .total-bar { padding: 10px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="form-header">
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="1.5"/>
+      <path d="M10 18 L18 10 L26 18 L18 26 Z" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+      <circle cx="18" cy="18" r="4" fill="#c9a84c"/>
+    </svg>
+    <span class="logo-text">IMAGESTATE</span>
+  </div>
+  <div class="progress-wrap" id="progressDots"></div>
+</div>
+
+<!-- TOTAL BAR -->
+<div class="total-bar">
+  <span class="total-label">Estimated Total</span>
+  <span class="total-amount" id="totalAmount">$0.00</span>
+</div>
+
+<!-- ==================== PAGE 1: CONTACT ==================== -->
+<div class="page active" id="page1">
+  <div class="page-inner">
+    <div class="page-num">Step 1 of 10</div>
+    <h1 class="page-title">Let's get started.</h1>
+    <p class="page-sub">Tell us about you and your listing. All fields marked * are required.</p>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">First Name *</label>
+        <input class="field-input" type="text" placeholder="Jane">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Last Name *</label>
+        <input class="field-input" type="text" placeholder="Smith">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Email Address *</label>
+      <input class="field-input" type="email" placeholder="jane@realty.com">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Phone Number *</label>
+      <input class="field-input" type="tel" placeholder="(760) 555-0100">
+    </div>
+
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-text">Property Details</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Listing Street Address *</label>
+      <input class="field-input" type="text" placeholder="123 Desert Rose Drive">
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">City *</label>
+        <input class="field-input" type="text" placeholder="Palm Springs">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Zip Code *</label>
+        <input class="field-input" type="text" placeholder="92262">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Approximate Square Footage *</label>
+      <input class="field-input" type="text" placeholder="e.g. 3,200">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Will you be attending the appointment? *</label>
+      <div class="toggle-row">
+        <button class="toggle-btn active" onclick="selectToggle(this)">Yes</button>
+        <button class="toggle-btn" onclick="selectToggle(this)">No</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Gate Code / Access Instructions</label>
+      <input class="field-input" type="text" placeholder="Gate code, lockbox, key location...">
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 2: SERVICE ==================== -->
+<div class="page" id="page2">
+  <div class="page-inner">
+    <div class="page-num">Step 2 of 10</div>
+    <h1 class="page-title">Select your service.</h1>
+    <p class="page-sub">Choose the primary service for your listing. Aerial photography is included with all packages, subject to FAA airspace availability.</p>
+
+    <div class="aerial-note">
+      <span>✦ Drone & Aerial Included</span> — All packages include aerial photography at no extra cost, subject to FAA airspace restrictions at your location.
+    </div>
+
+    <div class="service-grid">
+      <div class="service-card" onclick="selectService(this, 'photo', 0)" data-service="photo">
+        <div class="service-card-left">
+          <div class="service-badge badge-standard">Photography</div>
+          <div class="service-name">Photography Only</div>
+          <div class="service-desc">HDR interior & exterior photos + aerial. 24-hour delivery.</div>
+          <div class="includes-list">
+            <span class="include-tag">HDR Photos</span>
+            <span class="include-tag">Aerial</span>
+            <span class="include-tag">24hr Delivery</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="service-price">From $249</span>
+          <div class="check-circle">
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="selectService(this, 'video', 0)" data-service="video">
+        <div class="service-card-left">
+          <div class="service-badge badge-standard">Videography</div>
+          <div class="service-name">Videography Only</div>
+          <div class="service-desc">Cinematic listing video + aerial footage. 48-hour delivery.</div>
+          <div class="includes-list">
+            <span class="include-tag">Cinematic Edit</span>
+            <span class="include-tag">Aerial</span>
+            <span class="include-tag">Licensed Music</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="service-price">From $549</span>
+          <div class="check-circle">
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="selectService(this, 'bundle', 0)" data-service="bundle">
+        <div class="service-card-left">
+          <div class="service-badge badge-bundle">Best Value</div>
+          <div class="service-name">Photography + Video Bundle</div>
+          <div class="service-desc">Both services, one shoot, one delivery. Maximum listing impact.</div>
+          <div class="includes-list">
+            <span class="include-tag">HDR Photos</span>
+            <span class="include-tag">Cinematic Video</span>
+            <span class="include-tag">Aerial</span>
+            <span class="include-tag">Priority Delivery</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="service-price">From $798</span>
+          <div class="check-circle">
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="selectService(this, 'tour', 125)" data-service="tour">
+        <div class="service-card-left">
+          <div class="service-badge badge-premium">Virtual Tour</div>
+          <div class="service-name">360 Virtual Tour Only</div>
+          <div class="service-desc">Immersive virtual walkthrough. Can also be added to any package above.</div>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="service-price">From $125</span>
+          <div class="check-circle">
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 3: PHOTO PRICING ==================== -->
+<div class="page" id="page3">
+  <div class="page-inner">
+    <div class="page-num">Step 3 of 10</div>
+    <h1 class="page-title">Photography pricing.</h1>
+    <p class="page-sub">Select your property's size. All packages include HDR photography, aerial shots, and 24-hour delivery.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-option" onclick="selectPricing(this, 'photo', 249)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">Standard</div>
+            <div class="pricing-name">Under 1,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$249</div>
+      </div>
+
+      <div class="pricing-option" onclick="selectPricing(this, 'photo', 299)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">Standard</div>
+            <div class="pricing-name">1,501 – 2,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$299</div>
+      </div>
+
+      <div class="pricing-option" onclick="selectPricing(this, 'photo', 369)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">Standard</div>
+            <div class="pricing-name">2,501 – 3,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$369</div>
+      </div>
+
+      <div class="pricing-option" onclick="selectPricing(this, 'photo', 499)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">Premium</div>
+            <div class="pricing-name">3,501 – 4,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$499</div>
+      </div>
+
+      <div class="pricing-option" onclick="selectPricing(this, 'photo', 599)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">Premium</div>
+            <div class="pricing-name">4,501 – 5,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$599</div>
+      </div>
+
+      <div class="pricing-option" onclick="selectPricing(this, 'photo', 699)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">Premium</div>
+            <div class="pricing-name">5,501 – 6,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$699</div>
+      </div>
+
+      <div class="pricing-option luxury-option" onclick="selectPricing(this, 'photo', 999)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">✦ Luxury Estate</div>
+            <div class="pricing-name">6,501 – 8,000 SqFt</div>
+            <div class="pricing-note">Full RAW workflow · Advanced window pulls · Up to 60 images</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$999</div>
+      </div>
+
+      <div class="pricing-option luxury-option" onclick="selectPricing(this, 'photo', 1299)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">✦ Luxury Estate</div>
+            <div class="pricing-name">8,001 – 9,500 SqFt</div>
+            <div class="pricing-note">Full RAW workflow · Advanced window pulls · Up to 60 images</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$1,299</div>
+      </div>
+
+      <div class="pricing-option luxury-option" onclick="selectPricing(this, 'photo', 1599)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-tier">✦ Luxury Estate</div>
+            <div class="pricing-name">9,500+ SqFt</div>
+            <div class="pricing-note">Full RAW workflow · Advanced window pulls · Up to 60 images</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$1,599</div>
+      </div>
+    </div>
+
+    <div class="luxury-note">
+      ✦ <strong>Luxury Estate</strong> shoots include our full manual editing workflow with RAW file processing, advanced luminosity window pulls, and premium color grading — the highest quality output we offer.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 4: VIDEO PRICING ==================== -->
+<div class="page" id="page4">
+  <div class="page-inner">
+    <div class="page-num">Step 4 of 10</div>
+    <h1 class="page-title">Videography pricing.</h1>
+    <p class="page-sub">All videos include aerial footage, licensed music, and cinematic editing. Delivered within 48 hours.</p>
+
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-text">Daytime Cinematic Video</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <div class="pricing-grid" style="margin-bottom:8px;">
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 549)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-name">Under 2,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$549</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 699)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">2,501 – 4,500 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$699</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 899)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">4,501 – 6,000 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$899</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 1199)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">6,000+ SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$1,199</div>
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-text">Day-to-Dusk Cinematic Video</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <div class="pricing-grid" style="margin-bottom:8px;">
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 749)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
+            <div class="pricing-name">Under 2,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$749</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 899)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
+            <div class="pricing-name">2,501 – 4,500 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$899</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 1099)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
+            <div class="pricing-name">4,501 – 6,000 SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$1,099</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 1399)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
+            <div class="pricing-name">6,000+ SqFt</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$1,399</div>
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-text">Simple Walkthrough</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-option" onclick="selectPricing(this, 'video', 149)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-name">Simple Walkthrough Video</div>
+            <div class="pricing-note">No cuts, no music — continuous walkthrough</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$149</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 5: PHOTO ADD-ONS ==================== -->
+<div class="page" id="page5">
+  <div class="page-inner">
+    <div class="page-num">Step 5 of 10</div>
+    <h1 class="page-title">Enhance your photos.</h1>
+    <p class="page-sub">Add any of the following to your photography package. All add-ons are delivered with your final images.</p>
+
+    <div class="addon-grid">
+      <div class="addon-card" onclick="toggleAddon(this, 399)" data-name="Twilight Session">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Twilight Session</div>
+          <div class="addon-desc">Real golden hour + dusk exterior shoot</div>
+          <div class="addon-price">$399</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 79)" data-name="Virtual Twilight x1">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Virtual Twilight ×1</div>
+          <div class="addon-desc">AI-generated dusk from daytime photo</div>
+          <div class="addon-price">$79</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 139)" data-name="Virtual Twilight x2">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Virtual Twilight ×2</div>
+          <div class="addon-desc">Two AI-generated dusk images</div>
+          <div class="addon-price">$139</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Feature Detail Shots">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Feature Detail Shots</div>
+          <div class="addon-desc">Close-up lifestyle details, ideal for luxury & vacation rentals</div>
+          <div class="addon-price">$149</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 99)" data-name="Community Area Shots">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Community Area Shots</div>
+          <div class="addon-desc">Pool, clubhouse, amenity areas</div>
+          <div class="addon-price">$99</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 69)" data-name="Grass Addition">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Grass Addition</div>
+          <div class="addon-desc">Virtual grass for dead or patchy lawns</div>
+          <div class="addon-price">$69</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Rush Processing">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Rush Processing</div>
+          <div class="addon-desc">Next morning delivery by 9am</div>
+          <div class="addon-price">$149</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Slideshow Video">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Slideshow Video</div>
+          <div class="addon-desc">Branded photo slideshow for social media</div>
+          <div class="addon-price">$149</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 6: VIRTUAL STAGING ==================== -->
+<div class="page" id="page6">
+  <div class="page-inner">
+    <div class="page-num">Step 6 of 10</div>
+    <h1 class="page-title">Virtual staging.</h1>
+    <p class="page-sub">Virtually furnish empty rooms to help buyers visualize the space. Delivered within 48 hours.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-option" onclick="selectPricing(this, 'staging', 0)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">No virtual staging</div></div>
+        </div>
+        <div class="pricing-amount">$0</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'staging', 79)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">1 Photo</div></div>
+        </div>
+        <div class="pricing-amount">$79</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'staging', 189)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info">
+            <div class="pricing-name">3 Photos</div>
+            <div class="pricing-note">Most popular for vacant listings</div>
+          </div>
+        </div>
+        <div class="pricing-amount">$189</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'staging', 249)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">5 Photos</div></div>
+        </div>
+        <div class="pricing-amount">$249</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 7: VIDEO ADD-ONS ==================== -->
+<div class="page" id="page7">
+  <div class="page-inner">
+    <div class="page-num">Step 7 of 10</div>
+    <h1 class="page-title">Video add-ons.</h1>
+    <p class="page-sub">Personalize and extend your video package.</p>
+
+    <div class="addon-grid">
+      <div class="addon-card" onclick="toggleAddon(this, 99)" data-name="Branded Video">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Branded Video</div>
+          <div class="addon-desc">Add your logo, contact info, and title cards</div>
+          <div class="addon-price">$99</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 199)" data-name="Agent On Camera">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Agent On Camera</div>
+          <div class="addon-desc">Professional on-camera presence for personalized tours</div>
+          <div class="addon-price">$199</div>
+        </div>
+      </div>
+
+      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Extra Video Minutes">
+        <div class="addon-check">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="addon-info">
+          <div class="addon-name">Extra Video Minutes</div>
+          <div class="addon-desc">Extend final edit beyond standard length</div>
+          <div class="addon-price">$149</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 8: FLOOR PLANS ==================== -->
+<div class="page" id="page8">
+  <div class="page-inner">
+    <div class="page-num">Step 8 of 10</div>
+    <h1 class="page-title">Floor plans.</h1>
+    <p class="page-sub">2D floor plans help buyers understand layout and are ideal for MLS listings.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-option" onclick="selectPricing(this, 'floor', 0)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">No floor plan</div></div>
+        </div>
+        <div class="pricing-amount">$0</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'floor', 99)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">Under 1,500 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$99</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'floor', 150)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">1,500 – 2,500 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$150</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'floor', 210)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">2,500 – 3,500 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$210</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'floor', 275)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">3,500 – 4,500 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$275</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 9: 360 TOUR ==================== -->
+<div class="page" id="page9">
+  <div class="page-inner">
+    <div class="page-num">Step 9 of 10</div>
+    <h1 class="page-title">360 Virtual Tour.</h1>
+    <p class="page-sub">Add an immersive virtual walkthrough to your package. Optional — skip if not needed.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-option" onclick="selectPricing(this, 'tour', 0)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">No virtual tour</div></div>
+        </div>
+        <div class="pricing-amount">$0</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'tour', 125)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">Up to 2,500 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$125</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'tour', 165)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">2,501 – 3,500 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$165</div>
+      </div>
+      <div class="pricing-option" onclick="selectPricing(this, 'tour', 225)">
+        <div class="pricing-left">
+          <div class="radio-dot"><div class="radio-inner"></div></div>
+          <div class="pricing-info"><div class="pricing-name">3,501 – 5,000 SqFt</div></div>
+        </div>
+        <div class="pricing-amount">$225</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 10: SCHEDULE ==================== -->
+<div class="page" id="page10">
+  <div class="page-inner">
+    <div class="page-num">Step 10 of 10</div>
+    <h1 class="page-title">Schedule your shoot.</h1>
+    <p class="page-sub">Select your preferred date and time. We'll confirm within 2 hours of submission.</p>
+
+    <div class="field-group">
+      <label class="field-label">Preferred Date *</label>
+      <input class="field-input" type="date">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Preferred Time *</label>
+      <div class="schedule-grid">
+        <div class="time-slot" onclick="selectTime(this)">8:00 – 9:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">9:00 – 10:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">10:00 – 11:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">11:00 AM – 12:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)">12:00 – 1:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)">1:00 – 2:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)">2:00 – 3:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)">3:00 – 4:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)">4:00 – 5:00 PM</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Special Accommodations</label>
+      <textarea class="field-input" rows="4" placeholder="Any special instructions, preparation notes, or requests for your shoot..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE 11: REVIEW ==================== -->
+<div class="page" id="page11">
+  <div class="page-inner">
+    <div class="page-num">Review & Confirm</div>
+    <h1 class="page-title">Almost done.</h1>
+    <p class="page-sub">Review your order before submitting. We'll reach out within 2 hours to confirm your booking.</p>
+
+    <div class="review-section" id="reviewContact">
+      <div class="review-section-title">Contact & Property</div>
+      <div class="review-line"><span class="review-line-label">Name</span><span class="review-line-value">—</span></div>
+      <div class="review-line"><span class="review-line-label">Email</span><span class="review-line-value">—</span></div>
+      <div class="review-line"><span class="review-line-label">Phone</span><span class="review-line-value">—</span></div>
+      <div class="review-line"><span class="review-line-label">Address</span><span class="review-line-value">—</span></div>
+    </div>
+
+    <div class="review-section" id="reviewServices">
+      <div class="review-section-title">Selected Services</div>
+      <div id="reviewServicesList">
+        <div class="review-line"><span class="review-line-label">Service</span><span class="review-line-value" id="reviewServiceName">—</span></div>
+        <div class="review-line"><span class="review-line-label">Photography</span><span class="review-line-value" id="reviewPhotoPrice">—</span></div>
+        <div class="review-line"><span class="review-line-label">Video</span><span class="review-line-value" id="reviewVideoPrice">—</span></div>
+        <div class="review-line"><span class="review-line-label">Virtual Staging</span><span class="review-line-value" id="reviewStagingPrice">—</span></div>
+        <div class="review-line"><span class="review-line-label">Floor Plan</span><span class="review-line-value" id="reviewFloorPrice">—</span></div>
+        <div class="review-line"><span class="review-line-label">Virtual Tour</span><span class="review-line-value" id="reviewTourPrice">—</span></div>
+        <div class="review-line" id="reviewAddonsLine"><span class="review-line-label">Add-Ons</span><span class="review-line-value" id="reviewAddons">—</span></div>
+      </div>
+    </div>
+
+    <div class="review-total">
+      <div>
+        <div class="review-total-label">Total Estimate</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Final invoice sent on confirmation</div>
+      </div>
+      <div class="review-total-amount" id="reviewTotal">$0</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SUCCESS ==================== -->
+<div class="page" id="pageSuccess">
+  <div class="page-inner">
+    <div class="success-page">
+      <div class="success-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M6 16L13 23L26 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 class="page-title" style="margin-bottom:16px;">Booking received.</h1>
+      <p class="page-sub" style="max-width:400px;margin:0 auto;">Thank you for choosing IMAGESTATE. We'll confirm your appointment within 2 hours. Check your email for a copy of this booking.</p>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="form-nav" id="formNav">
+  <button class="btn-back" id="btnBack" onclick="prevPage()">← Back</button>
+  <button class="btn-next" id="btnNext" onclick="nextPage()">Continue →</button>
+</div>
+
+<script>
+  const TOTAL_PAGES = 11;
+  let currentPage = 1;
+  let selectedService = null;
+
+  const prices = {
+    service: 0,
+    photo: 0,
+    video: 0,
+    staging: 0,
+    floor: 0,
+    tour: 0,
+    addons: 0
+  };
+
+  const addonNames = [];
+
+  function buildProgress() {
+    const wrap = document.getElementById('progressDots');
+    wrap.innerHTML = '';
+    for (let i = 1; i <= TOTAL_PAGES; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'progress-step' + (i === currentPage ? ' active' : i < currentPage ? ' done' : '');
+      wrap.appendChild(dot);
+    }
+  }
+
+  function updateTotal() {
+    const total = Object.values(prices).reduce((a, b) => a + b, 0);
+    document.getElementById('totalAmount').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('reviewTotal').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 0});
+  }
+
+  function selectToggle(btn) {
+    btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function selectService(card, service, price) {
+    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedService = service;
+    prices.service = price;
+    updateTotal();
+  }
+
+  function selectPricing(option, type, price) {
+    const grid = option.parentElement;
+    grid.querySelectorAll('.pricing-option').forEach(o => o.classList.remove('selected'));
+    option.classList.add('selected');
+    prices[type] = price;
+    updateTotal();
+  }
+
+  function toggleAddon(card, price) {
+    card.classList.toggle('selected');
+    const name = card.dataset.name;
+    if (card.classList.contains('selected')) {
+      prices.addons += price;
+      addonNames.push(name);
+    } else {
+      prices.addons -= price;
+      const idx = addonNames.indexOf(name);
+      if (idx > -1) addonNames.splice(idx, 1);
+    }
+    updateTotal();
+  }
+
+  function selectTime(slot) {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+    slot.classList.add('selected');
+  }
+
+  function getPageSequence() {
+    const seq = [1, 2];
+    if (selectedService === 'photo' || selectedService === 'bundle') seq.push(3);
+    if (selectedService === 'video' || selectedService === 'bundle') seq.push(4);
+    if (selectedService === 'photo' || selectedService === 'bundle') seq.push(5, 6);
+    if (selectedService === 'video' || selectedService === 'bundle') seq.push(7);
+    seq.push(8, 9, 10, 11);
+    return seq;
+  }
+
+  function nextPage() {
+    const seq = getPageSequence();
+    const idx = seq.indexOf(currentPage);
+    if (idx < seq.length - 1) {
+      showPage(seq[idx + 1]);
+    } else {
+      showSuccess();
+    }
+  }
+
+  function prevPage() {
+    const seq = getPageSequence();
+    const idx = seq.indexOf(currentPage);
+    if (idx > 0) showPage(seq[idx - 1]);
+  }
+
+  function showPage(num) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page' + num).classList.add('active');
+    currentPage = num;
+    buildProgress();
+    updateNavButtons();
+    window.scrollTo(0, 0);
+  }
+
+  function showSuccess() {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('pageSuccess').classList.add('active');
+    document.getElementById('formNav').style.display = 'none';
+    document.getElementById('progressDots').innerHTML = '';
+  }
+
+  function updateNavButtons() {
+    const seq = getPageSequence();
+    const idx = seq.indexOf(currentPage);
+    const backBtn = document.getElementById('btnBack');
+    const nextBtn = document.getElementById('btnNext');
+
+    backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
+
+    if (currentPage === 11) {
+      nextBtn.textContent = 'Submit Booking';
+      nextBtn.className = 'btn-submit';
+    } else {
+      nextBtn.textContent = 'Continue →';
+      nextBtn.className = 'btn-next';
+    }
+
+    // Update page num labels
+    const pageNumEl = document.querySelector('#page' + currentPage + ' .page-num');
+    if (pageNumEl && currentPage !== 11) {
+      pageNumEl.textContent = 'Step ' + (idx + 1) + ' of ' + seq.length;
+    }
+  }
+
+  buildProgress();
+  updateNavButtons();
+  updateTotal();
+</script>
+</body>
+</html>

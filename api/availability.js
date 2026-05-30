@@ -87,7 +87,11 @@ module.exports = async (req, res) => {
 
     const events = response.data.items || [];
     console.log('Total events fetched:', events.length);
+    console.log('timeMin:', now.toISOString(), 'timeMax:', future.toISOString());
     console.log('Event summaries:', events.map(e => e.summary + ' | ' + (e.start.dateTime || e.start.date)).join(', '));
+
+    // Also return debug info
+    const debugInfo = { totalEvents: events.length, timeMin: now.toISOString() };
     const imagestateEvents = events.filter(e => e.summary && e.summary.includes('IMAGESTATE MEDIA APPT'));
     const blockerEvents    = events.filter(e => {
       if (!e.summary || !e.summary.includes('IMAGESTATE MEDIA APPT')) {
@@ -154,6 +158,7 @@ module.exports = async (req, res) => {
       blockedDates: [...blockedSet],
       slotsByDate,
       today: todayPac.date,
+      debug: debugInfo,
     });
 
   } catch (error) {

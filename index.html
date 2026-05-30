@@ -904,13 +904,13 @@ async function refreshAvailability() {
     grid.style.pointerEvents = 'none';
   }
   try {
-    const r = await fetch('/api/availability?t=' + Date.now()); // cache-bust
+    const r = await fetch('/api/availability?t=' + Date.now());
     const d = await r.json();
     availData = d;
     fullyBookedDates = d.fullyBooked || [];
     slotsByDate = d.slotsByDate || {};
   } catch(e) {
-    // Keep existing data if refresh fails
+    availData = { error: 'FETCH FAILED: ' + e.message, fullyBooked: [], blockedDates: [], slotsByDate: {}, today: '' };
   }
   if (grid) {
     grid.style.opacity = '1';

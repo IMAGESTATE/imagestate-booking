@@ -702,10 +702,34 @@
       </div>
     </div>
 
-    <div class="field-group">
-      <label class="field-label">Gate Code / Access Instructions</label>
-      <input class="field-input" id="accessNotes" type="text" placeholder="Gate code, lockbox, key location...">
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-text">Property Access</span>
+      <div class="section-divider-line"></div>
     </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Front Door Code</label>
+        <input class="field-input" id="doorCode" type="text" placeholder="e.g. 2772">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Gate Code</label>
+        <input class="field-input" id="gateCode" type="text" placeholder="e.g. 11167">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Combo / Lockbox Code</label>
+        <input class="field-input" id="comboCode" type="text" placeholder="e.g. 1937">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Other Access Notes</label>
+        <input class="field-input" id="accessNotes" type="text" placeholder="Key location, notes...">
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1043,7 +1067,7 @@
         </div>
         <div class="addon-info">
           <div class="addon-name">Twilight Session</div>
-          <div class="addon-desc">Real golden hour + dusk exterior shoot</div>
+          <div class="addon-desc">Real golden hour + dusk exterior shoot. Time coordinated directly with you.</div>
           <div class="addon-price">$399</div>
         </div>
       </div>
@@ -1316,16 +1340,21 @@
 
     <div class="field-group">
       <label class="field-label">Preferred Time *</label>
-      <div class="schedule-grid">
-        <div class="time-slot" onclick="selectTime(this)">8:00 – 9:00 AM</div>
-        <div class="time-slot" onclick="selectTime(this)">9:00 – 10:00 AM</div>
-        <div class="time-slot" onclick="selectTime(this)">10:00 – 11:00 AM</div>
-        <div class="time-slot" onclick="selectTime(this)">11:00 AM – 12:00 PM</div>
-        <div class="time-slot" onclick="selectTime(this)">12:00 – 1:00 PM</div>
-        <div class="time-slot" onclick="selectTime(this)">1:00 – 2:00 PM</div>
-        <div class="time-slot" onclick="selectTime(this)">2:00 – 3:00 PM</div>
-        <div class="time-slot" onclick="selectTime(this)">3:00 – 4:00 PM</div>
-        <div class="time-slot" onclick="selectTime(this)">4:00 – 5:00 PM</div>
+      <div id="timeSlotContainer">
+        <div class="schedule-grid">
+          <div class="time-slot" onclick="selectTime(this)" data-time="8:00 AM">8:00 AM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="9:00 AM">9:00 AM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="10:00 AM">10:00 AM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="11:00 AM">11:00 AM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="12:00 PM">12:00 PM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="1:00 PM">1:00 PM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="2:00 PM">2:00 PM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="3:00 PM">3:00 PM</div>
+          <div class="time-slot" onclick="selectTime(this)" data-time="4:00 PM">4:00 PM</div>
+        </div>
+      </div>
+      <div id="twilightTimeNote" style="display:none; background:#042752; color:rgba(255,255,255,0.8); border-radius:8px; padding:14px 16px; font-size:13px; line-height:1.6;">
+        🌅 <strong style="color:#00a896;">Twilight Session</strong> — Your shoot time will be coordinated directly with you based on sunset. No time selection needed.
       </div>
     </div>
 
@@ -1459,6 +1488,17 @@
       if (idx > -1) addonNames.splice(idx, 1);
     }
     updateTotal();
+    updateTwilightUI();
+  }
+
+  function updateTwilightUI() {
+    const isTwilight = addonNames.includes('Twilight Session');
+    const timeSlotContainer = document.getElementById('timeSlotContainer');
+    const twilightNote = document.getElementById('twilightTimeNote');
+    if (timeSlotContainer && twilightNote) {
+      timeSlotContainer.style.display = isTwilight ? 'none' : 'block';
+      twilightNote.style.display = isTwilight ? 'block' : 'none';
+    }
   }
 
   function selectTime(slot) {
@@ -1557,6 +1597,7 @@
     const street      = document.getElementById('street').value.trim();
     const city        = document.getElementById('city').value.trim();
     const zip         = document.getElementById('zip').value.trim();
+    const sqft        = document.getElementById('sqft').value.trim();
     const scheduledDate = document.getElementById('scheduledDate').value;
     const specialNotes  = document.getElementById('specialNotes').value.trim();
 
@@ -1564,12 +1605,17 @@
     const attending = attendingBtn ? attendingBtn.textContent.trim() : 'Not specified';
 
     const accessNotes = document.getElementById('accessNotes').value.trim();
+    const doorCode    = document.getElementById('doorCode').value.trim();
+    const gateCode    = document.getElementById('gateCode').value.trim();
+    const comboCode   = document.getElementById('comboCode').value.trim();
+
+    const isTwilight = addonNames.includes('Twilight Session');
 
     const serviceCard = document.querySelector('.service-card.selected');
     const service = serviceCard ? serviceCard.querySelector('.service-name').textContent : 'Not selected';
 
     const timeSlot = document.querySelector('.time-slot.selected');
-    const scheduledTime = timeSlot ? timeSlot.textContent.trim() : 'Not selected';
+    const scheduledTime = isTwilight ? 'Twilight – TBD' : (timeSlot ? timeSlot.dataset.time : 'Not selected');
 
     const grandTotal = Object.values(prices).reduce((a, b) => a + b, 0);
 
@@ -1585,7 +1631,9 @@
       addons:       addonNames.join(', '),
       addonTotal:   prices.addons,
       scheduledDate, scheduledTime, specialNotes,
-      grandTotal
+      grandTotal,
+      doorCode, gateCode, comboCode, sqft,
+      isTwilight
     };
 
     try {

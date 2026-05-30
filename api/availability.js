@@ -10,56 +10,56 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
 const ALL_SLOTS = ['8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
 
-function toLocalDate(dateTimeStr) {
-  const d = new Date(dateTimeStr);
-  const pacificHour = d.getUTCHours() - 7;
-  const y = d.getUTCFullYear();
-  const mo = d.getUTCMonth();
-  const day = d.getUTCDate();
-  // If hour goes negative, it's the previous day in Pacific time
-  if (pacificHour < 0) {
-    const prev = new Date(Date.UTC(y, mo, day - 1));
-    return prev.toISOString().substring(0, 10);
-  }
-  return dateTimeStr.substring(0, 10);
+// Convert UTC ISO string to Pacific date string (YYYY-MM-DD) and hour (0-23)
+function utcToPacific(isoStr) {
+  const d = new Date(isoStr);
+  // PDT = UTC-7, PST = UTC-8. We hardcode -7 (PDT) for Coachella Valley shooting season
+  const pacificMs = d.getTime() - (7 * 60 * 60 * 1000);
+  const p = new Date(pacificMs);
+  const yyyy = p.getUTCFullYear();
+  const mm   = String(p.getUTCMonth() + 1).padStart(2, '0');
+  const dd   = String(p.getUTCDate()).padStart(2, '0');
+  const hh   = p.getUTCHours();
+  const min  = p.getUTCMinutes();
+  return {
+    date: `${yyyy}-${mm}-${dd}`,
+    hour: hh,
+    minutes: min
+  };
 }
 
-function toSlotLabel(dateTimeStr) {
-  const d = new Date(dateTimeStr);
-  const pacificHour = d.getUTCHours() - 7;
-  const minutes = d.getUTCMinutes();
-  if (pacificHour < 0 || pacificHour > 16) return null;
-  const h12 = pacificHour === 0 ? 12 : pacificHour > 12 ? pacificHour - 12 : pacificHour;
-  const ampm = pacificHour < 12 ? 'AM' : 'PM';
+function hourToSlotLabel(hour, minutes) {
+  if (hour < 8 || hour > 16) return null;
+  const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  const ampm = hour < 12 ? 'AM' : 'PM';
   const minStr = minutes === 0 ? '00' : String(minutes).padStart(2, '0');
-  return h12 + ':' + minStr + ' ' + ampm;
+  return `${h12}:${minStr} ${ampm}`;
 }
 
-// Get all dates a multi-day or all-day event covers
-function getBlockedDates(event) {
+// Get all calendar dates covered by an event (for all-day and multi-day blocking)
+function getEventDates(event) {
   const dates = [];
   if (event.start.date) {
-    // All-day event
-    const start = new Date(event.start.date);
-    const end = new Date(event.end.date);
-    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
-      dates.push(d.toISOString().substring(0, 10));
+    // All-day event: start.date to end.date (end is exclusive in Google Calendar)
+    const start = new Date(event.start.date + 'T00:00:00Z');
+    const end   = new Date(event.end.date   + 'T00:00:00Z');
+    for (let d = new Date(start); d < end; d.setUTCDate(d.getUTCDate() + 1)) {
+      const yyyy = d.getUTCFullYear();
+      const mm   = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const dd   = String(d.getUTCDate()).padStart(2, '0');
+      dates.push(`${yyyy}-${mm}-${dd}`);
     }
   } else if (event.start.dateTime) {
-    // Timed event — block just that day in Pacific time
-    dates.push(toLocalDate(event.start.dateTime));
-    // If multi-day timed event
-    if (event.end.dateTime) {
-      const start = new Date(event.start.dateTime);
-      const end = new Date(event.end.dateTime);
-      const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-      if (diffDays > 1) {
-        for (let i = 1; i < diffDays; i++) {
-          const d = new Date(start);
-          d.setDate(d.getDate() + i);
-          dates.push(d.toISOString().substring(0, 10));
-        }
-      }
+    const startPac = utcToPacific(event.start.dateTime);
+    const endPac   = utcToPacific(event.end.dateTime);
+    // Add all dates from start to end
+    const startD = new Date(startPac.date + 'T00:00:00Z');
+    const endD   = new Date(endPac.date   + 'T00:00:00Z');
+    for (let d = new Date(startD); d <= endD; d.setUTCDate(d.getUTCDate() + 1)) {
+      const yyyy = d.getUTCFullYear();
+      const mm   = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const dd   = String(d.getUTCDate()).padStart(2, '0');
+      dates.push(`${yyyy}-${mm}-${dd}`);
     }
   }
   return [...new Set(dates)];
@@ -73,9 +73,9 @@ module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const now = new Date();
+    const now    = new Date();
     const future = new Date();
-    future.setDate(future.getDate() + 120); // 4 months ahead
+    future.setDate(future.getDate() + 120);
 
     const response = await calendar.events.list({
       calendarId: 'primary',
@@ -87,45 +87,71 @@ module.exports = async (req, res) => {
 
     const events = response.data.items || [];
     const imagestateEvents = events.filter(e => e.summary && e.summary.includes('IMAGESTATE MEDIA APPT'));
-    const blockerEvents   = events.filter(e => !e.summary || !e.summary.includes('IMAGESTATE MEDIA APPT'));
+    const blockerEvents    = events.filter(e => {
+      if (!e.summary || !e.summary.includes('IMAGESTATE MEDIA APPT')) {
+        // Skip events the user declined
+        const self = (e.attendees || []).find(a => a.self);
+        if (self && self.responseStatus === 'declined') return false;
+        // Skip free/transparent events
+        if (e.transparency === 'transparent') return false;
+        return true;
+      }
+      return false;
+    });
 
-    // Build IMAGESTATE bookings map: date -> [slots]
+    // Build IMAGESTATE bookings: date -> Set of slot labels
     const bookingsByDate = {};
     for (const event of imagestateEvents) {
-      const dateStr = event.start.dateTime ? toLocalDate(event.start.dateTime) : event.start.date;
-      const slot    = event.start.dateTime ? toSlotLabel(event.start.dateTime) : null;
-      if (!bookingsByDate[dateStr]) bookingsByDate[dateStr] = [];
-      if (slot && !bookingsByDate[dateStr].includes(slot)) bookingsByDate[dateStr].push(slot);
+      if (!event.start.dateTime) continue;
+      const { date, hour, minutes } = utcToPacific(event.start.dateTime);
+      const slot = hourToSlotLabel(hour, minutes);
+      if (!bookingsByDate[date]) bookingsByDate[date] = new Set();
+      if (slot) bookingsByDate[date].add(slot);
     }
 
-    // Dates with 3+ IMAGESTATE bookings = fully booked
-    const fullyBooked = Object.entries(bookingsByDate)
+    // Convert sets to arrays
+    const slotsByDate = {};
+    for (const [date, slots] of Object.entries(bookingsByDate)) {
+      slotsByDate[date] = [...slots];
+    }
+
+    // Dates with 3+ unique IMAGESTATE slots = fully booked
+    const fullyBooked = Object.entries(slotsByDate)
       .filter(([, slots]) => slots.length >= 3)
       .map(([date]) => date);
 
+    // Also fully booked if same slot appears multiple times (count raw events per date)
+    const rawCountByDate = {};
+    for (const event of imagestateEvents) {
+      if (!event.start.dateTime) continue;
+      const { date } = utcToPacific(event.start.dateTime);
+      rawCountByDate[date] = (rawCountByDate[date] || 0) + 1;
+    }
+    Object.entries(rawCountByDate).forEach(([date, count]) => {
+      if (count >= 3 && !fullyBooked.includes(date)) fullyBooked.push(date);
+    });
+
     // Build blocked dates from non-IMAGESTATE events
-    const blockedSet = new Set();
+    const blockedSet = new Set(fullyBooked);
     for (const event of blockerEvents) {
-      // Skip declined events
-      const selfStatus = (event.attendees || []).find(a => a.self);
-      if (selfStatus && selfStatus.responseStatus === 'declined') continue;
-      // Skip events marked as free/transparent
-      if (event.transparency === 'transparent') continue;
-      const dates = getBlockedDates(event);
-      dates.forEach(d => blockedSet.add(d));
+      getEventDates(event).forEach(d => blockedSet.add(d));
     }
 
-    // Also add fully booked dates to blocked set
-    fullyBooked.forEach(d => blockedSet.add(d));
+    // Today in Pacific time
+    const todayPac = utcToPacific(now.toISOString());
 
-    // Past dates are also blocked
-    const todayStr = now.toISOString().substring(0, 10);
+    console.log('Availability check:', {
+      imagestateCount: imagestateEvents.length,
+      slotsByDate,
+      fullyBooked,
+      blockedCount: blockedSet.size
+    });
 
     return res.status(200).json({
       fullyBooked,
       blockedDates: [...blockedSet],
-      slotsByDate: bookingsByDate,
-      today: todayStr,
+      slotsByDate,
+      today: todayPac.date,
     });
 
   } catch (error) {

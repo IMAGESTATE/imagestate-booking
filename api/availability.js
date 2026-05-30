@@ -10,61 +10,6 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
 const ALL_SLOTS = ['8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'];
 
-// Convert UTC ISO string to Pacific date string (YYYY-MM-DD) and hour (0-23)
-function utcToPacific(isoStr) {
-  const d = new Date(isoStr);
-  // PDT = UTC-7, PST = UTC-8. We hardcode -7 (PDT) for Coachella Valley shooting season
-  const pacificMs = d.getTime() - (7 * 60 * 60 * 1000);
-  const p = new Date(pacificMs);
-  const yyyy = p.getUTCFullYear();
-  const mm   = String(p.getUTCMonth() + 1).padStart(2, '0');
-  const dd   = String(p.getUTCDate()).padStart(2, '0');
-  const hh   = p.getUTCHours();
-  const min  = p.getUTCMinutes();
-  return {
-    date: `${yyyy}-${mm}-${dd}`,
-    hour: hh,
-    minutes: min
-  };
-}
-
-function hourToSlotLabel(hour, minutes) {
-  if (hour < 8 || hour > 16) return null;
-  const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-  const ampm = hour < 12 ? 'AM' : 'PM';
-  const minStr = minutes === 0 ? '00' : String(minutes).padStart(2, '0');
-  return `${h12}:${minStr} ${ampm}`;
-}
-
-// Get all calendar dates covered by an event (for all-day and multi-day blocking)
-function getEventDates(event) {
-  const dates = [];
-  if (event.start.date) {
-    // All-day event: start.date to end.date (end is exclusive in Google Calendar)
-    const start = new Date(event.start.date + 'T00:00:00Z');
-    const end   = new Date(event.end.date   + 'T00:00:00Z');
-    for (let d = new Date(start); d < end; d.setUTCDate(d.getUTCDate() + 1)) {
-      const yyyy = d.getUTCFullYear();
-      const mm   = String(d.getUTCMonth() + 1).padStart(2, '0');
-      const dd   = String(d.getUTCDate()).padStart(2, '0');
-      dates.push(`${yyyy}-${mm}-${dd}`);
-    }
-  } else if (event.start.dateTime) {
-    const startPac = utcToPacific(event.start.dateTime);
-    const endPac   = utcToPacific(event.end.dateTime);
-    // Add all dates from start to end
-    const startD = new Date(startPac.date + 'T00:00:00Z');
-    const endD   = new Date(endPac.date   + 'T00:00:00Z');
-    for (let d = new Date(startD); d <= endD; d.setUTCDate(d.getUTCDate() + 1)) {
-      const yyyy = d.getUTCFullYear();
-      const mm   = String(d.getUTCMonth() + 1).padStart(2, '0');
-      const dd   = String(d.getUTCDate()).padStart(2, '0');
-      dates.push(`${yyyy}-${mm}-${dd}`);
-    }
-  }
-  return [...new Set(dates)];
-}
-
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -73,103 +18,121 @@ module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const now    = new Date();
+    // Use a wide window — 30 days back to 120 days forward to catch all events
+    const past   = new Date();
+    past.setDate(past.getDate() - 30);
     const future = new Date();
     future.setDate(future.getDate() + 120);
 
     const response = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: now.toISOString(),
+      timeMin: past.toISOString(),
       timeMax: future.toISOString(),
       singleEvents: true,
-      maxResults: 1000,
+      maxResults: 2500,
+      orderBy: 'startTime',
     });
 
     const events = response.data.items || [];
-    console.log('Total events fetched:', events.length);
-    console.log('timeMin:', now.toISOString(), 'timeMax:', future.toISOString());
-    console.log('Event summaries:', events.map(e => e.summary + ' | ' + (e.start.dateTime || e.start.date)).join(', '));
 
-    // Also return debug info
-    const debugInfo = { totalEvents: events.length, timeMin: now.toISOString() };
-    const imagestateEvents = events.filter(e => e.summary && e.summary.includes('IMAGESTATE MEDIA APPT'));
-    const blockerEvents    = events.filter(e => {
-      if (!e.summary || !e.summary.includes('IMAGESTATE MEDIA APPT')) {
-        // Skip events the user declined
-        const self = (e.attendees || []).find(a => a.self);
-        if (self && self.responseStatus === 'declined') return false;
-        // Skip free/transparent events
-        if (e.transparency === 'transparent') return false;
-        return true;
-      }
-      return false;
-    });
+    // Today in Pacific time (UTC-7)
+    const nowPac = new Date(Date.now() - 7 * 60 * 60 * 1000);
+    const today  = nowPac.toISOString().substring(0, 10);
 
-    // Build IMAGESTATE bookings: date -> Set of slot labels
-    const bookingsByDate = {};
+    // Separate IMAGESTATE bookings from personal/blocker events
+    const imagestateEvents = events.filter(e =>
+      e.summary && e.summary.toUpperCase().includes('IMAGESTATE')
+    );
+    const blockerEvents = events.filter(e =>
+      !e.summary || !e.summary.toUpperCase().includes('IMAGESTATE')
+    );
+
+    // Build slotsByDate for IMAGESTATE events
+    const slotsByDate = {};
     for (const event of imagestateEvents) {
       if (!event.start.dateTime) continue;
-      const { date, hour, minutes } = utcToPacific(event.start.dateTime);
-      const slot = hourToSlotLabel(hour, minutes);
-      if (!bookingsByDate[date]) bookingsByDate[date] = new Set();
-      if (slot) bookingsByDate[date].add(slot);
+      // Convert event start to Pacific time
+      const startUTC   = new Date(event.start.dateTime);
+      const startPac   = new Date(startUTC.getTime() - 7 * 60 * 60 * 1000);
+      const dateStr    = startPac.toISOString().substring(0, 10);
+      const pacHour    = startPac.getUTCHours();
+      const pacMin     = startPac.getUTCMinutes();
+      const h12        = pacHour === 0 ? 12 : pacHour > 12 ? pacHour - 12 : pacHour;
+      const ampm       = pacHour < 12 ? 'AM' : 'PM';
+      const slot       = h12 + ':' + String(pacMin).padStart(2,'0') + ' ' + ampm;
+
+      if (!slotsByDate[dateStr]) slotsByDate[dateStr] = [];
+      if (!slotsByDate[dateStr].includes(slot)) slotsByDate[dateStr].push(slot);
     }
 
-    // Convert sets to arrays
-    const slotsByDate = {};
-    for (const [date, slots] of Object.entries(bookingsByDate)) {
-      slotsByDate[date] = [...slots];
-    }
-
-    // Dates with 3+ unique IMAGESTATE slots = fully booked
-    const fullyBooked = Object.entries(slotsByDate)
-      .filter(([, slots]) => slots.length >= 3)
-      .map(([date]) => date);
-
-    // Also fully booked if same slot appears multiple times (count raw events per date)
+    // Count raw IMAGESTATE events per date (handles duplicate slots)
     const rawCountByDate = {};
     for (const event of imagestateEvents) {
       if (!event.start.dateTime) continue;
-      const { date } = utcToPacific(event.start.dateTime);
-      rawCountByDate[date] = (rawCountByDate[date] || 0) + 1;
+      const startPac = new Date(new Date(event.start.dateTime).getTime() - 7 * 60 * 60 * 1000);
+      const dateStr  = startPac.toISOString().substring(0, 10);
+      rawCountByDate[dateStr] = (rawCountByDate[dateStr] || 0) + 1;
     }
-    Object.entries(rawCountByDate).forEach(([date, count]) => {
-      if (count >= 3 && !fullyBooked.includes(date)) fullyBooked.push(date);
-    });
+
+    // Fully booked = 3+ IMAGESTATE events on that date
+    const fullyBooked = Object.entries(rawCountByDate)
+      .filter(([, count]) => count >= 3)
+      .map(([date]) => date);
 
     // Build blocked dates from non-IMAGESTATE events
     const blockedSet = new Set(fullyBooked);
+
     for (const event of blockerEvents) {
-      getEventDates(event).forEach(d => blockedSet.add(d));
+      // Skip declined events
+      const self = (event.attendees || []).find(a => a.self);
+      if (self && self.responseStatus === 'declined') continue;
+      // Skip free events
+      if (event.transparency === 'transparent') continue;
+
+      if (event.start.date) {
+        // All-day event
+        const start = new Date(event.start.date + 'T00:00:00Z');
+        const end   = new Date(event.end.date   + 'T00:00:00Z');
+        for (let d = new Date(start); d < end; d.setUTCDate(d.getUTCDate() + 1)) {
+          blockedSet.add(d.toISOString().substring(0, 10));
+        }
+      } else if (event.start.dateTime) {
+        const startPac = new Date(new Date(event.start.dateTime).getTime() - 7 * 60 * 60 * 1000);
+        const endPac   = new Date(new Date(event.end.dateTime).getTime()   - 7 * 60 * 60 * 1000);
+        const startDate = startPac.toISOString().substring(0, 10);
+        const endDate   = endPac.toISOString().substring(0, 10);
+        // Add all dates covered
+        const s = new Date(startDate + 'T00:00:00Z');
+        const e = new Date(endDate   + 'T00:00:00Z');
+        for (let d = new Date(s); d <= e; d.setUTCDate(d.getUTCDate() + 1)) {
+          blockedSet.add(d.toISOString().substring(0, 10));
+        }
+      }
     }
-
-    // Today in Pacific time
-    const todayPac = utcToPacific(now.toISOString());
-
-    console.log('Availability check:', {
-      imagestateCount: imagestateEvents.length,
-      slotsByDate,
-      fullyBooked,
-      blockedCount: blockedSet.size
-    });
 
     return res.status(200).json({
       fullyBooked,
       blockedDates: [...blockedSet],
       slotsByDate,
-      today: todayPac.date,
-      debug: debugInfo,
+      today,
+      debug: {
+        totalEvents: events.length,
+        imagestateCount: imagestateEvents.length,
+        blockerCount: blockerEvents.length,
+        rawCountByDate,
+        timeMin: past.toISOString(),
+      }
     });
 
   } catch (error) {
-    console.error('Availability error:', error.message, error.code);
-    return res.status(200).json({ 
+    console.error('Availability error:', error.message);
+    return res.status(200).json({
       error: error.message,
-      fullyBooked: [], 
-      blockedDates: [], 
-      slotsByDate: {}, 
-      today: new Date().toISOString().substring(0,10),
-      debug: 'API error: ' + error.message
+      fullyBooked: [],
+      blockedDates: [],
+      slotsByDate: {},
+      today: new Date(Date.now() - 7*60*60*1000).toISOString().substring(0,10),
+      debug: { totalEvents: 0, error: error.message }
     });
   }
 };

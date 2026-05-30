@@ -142,6 +142,8 @@
   .time-slot { padding: 12px 8px; text-align: center; border: 1.5px solid #dde0ea; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--navy); transition: all 0.2s; background: var(--white); }
   .time-slot:hover { border-color: var(--navy); }
   .time-slot.selected { border-color: var(--navy); background: var(--navy); color: var(--white); }
+  .time-slot.taken { background: #f0f0f0; border-color: #dde0ea; color: #bbb; cursor: not-allowed; text-decoration: line-through; }
+  .time-slot.taken:hover { border-color: #dde0ea; transform: none; }
 
   .review-section { background: var(--white); border-radius: 12px; padding: 22px; margin-bottom: 14px; }
   .review-section-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; font-weight: 500; }
@@ -429,6 +431,7 @@ let selectedPackageName = '';
 let addonTotal = 0;
 const addonNames = [];
 let fullyBookedDates = [];
+let slotsByDate = {};
 
 // ── TIER DETECTION ────────────────────────────────────────────
 function detectTier() {
@@ -706,14 +709,39 @@ function updateNavButtons() {
 function selectToggle(btn) { btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
 function selectTime(slot) { document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected')); slot.classList.add('selected'); }
 function checkDateAvailability(v) {
-  const note = document.getElementById('dateBookedNote');
+  const note  = document.getElementById('dateBookedNote');
   const input = document.getElementById('scheduledDate');
-  if (fullyBookedDates.includes(v)) { note.style.display='block'; input.style.borderColor='var(--error)'; }
-  else { note.style.display='none'; input.style.borderColor='#dde0ea'; }
+  if (fullyBookedDates.includes(v)) {
+    note.style.display = 'block';
+    input.style.borderColor = 'var(--error)';
+  } else {
+    note.style.display = 'none';
+    input.style.borderColor = '#dde0ea';
+  }
+  // Grey out taken time slots
+  const taken = (slotsByDate[v] || []);
+  document.querySelectorAll('.time-slot').forEach(slot => {
+    const t = slot.dataset.time;
+    if (taken.includes(t)) {
+      slot.classList.add('taken');
+      slot.classList.remove('selected');
+      slot.onclick = null;
+    } else {
+      slot.classList.remove('taken');
+      slot.onclick = function() { selectTime(this); };
+    }
+  });
 }
 async function loadAvailability() {
-  try { const r = await fetch('/api/availability'); const d = await r.json(); fullyBookedDates = d.fullyBooked || []; }
-  catch(e) { fullyBookedDates = []; }
+  try {
+    const r = await fetch('/api/availability');
+    const d = await r.json();
+    fullyBookedDates = d.fullyBooked || [];
+    slotsByDate = d.slotsByDate || {};
+  } catch(e) {
+    fullyBookedDates = [];
+    slotsByDate = {};
+  }
 }
 
 // ── REVIEW ────────────────────────────────────────────────────

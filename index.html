@@ -706,10 +706,6 @@ function validatePage4() {
 function nextPage() {
   if (currentPage === 1) { if (!validatePage1()) return; buildPackages(); }
   if (currentPage === 2) { if (!selectedPackageId) { alert('Please select a package to continue.'); return; } buildAddons(); }
-  if (currentPage === 3) {
-    // Refresh availability fresh right before showing the calendar
-    refreshAvailability();
-  }
   if (currentPage === 4) { if (!validatePage4()) return; populateReview(); }
   if (currentPage === 5) { submitForm(); return; }
   showPage(currentPage + 1);
@@ -724,6 +720,8 @@ function showPage(num) {
   buildProgress();
   updateNavButtons();
   window.scrollTo(0, 0);
+  // Always pull fresh calendar data when landing on schedule page
+  if (num === 4) refreshAvailability();
 }
 
 function buildProgress() {

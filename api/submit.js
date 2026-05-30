@@ -219,11 +219,12 @@ module.exports = async (req, res) => {
       if (meridiem === 'PM' && hours !== 12) hours += 12;
       if (meridiem === 'AM' && hours === 12) hours = 0;
       const startMM = String(minutes || 0).padStart(2, '0');
-      // Convert PDT (UTC-7) to UTC by adding 7 hours
-      const startUTC = hours + 7;
-      const endUTC   = hours + 8;
-      startDateTime = `${scheduledDate}T${String(startUTC).padStart(2,'0')}:${startMM}:00Z`;
-      endDateTime   = `${scheduledDate}T${String(endUTC).padStart(2,'0')}:${startMM}:00Z`;
+      // Build date object in PDT (UTC-7) and convert to ISO UTC
+      const [yr, mo, dy] = scheduledDate.split('-').map(Number);
+      const startDate = new Date(Date.UTC(yr, mo - 1, dy, hours + 7, minutes || 0, 0));
+      const endDate   = new Date(Date.UTC(yr, mo - 1, dy, hours + 8, minutes || 0, 0));
+      startDateTime = startDate.toISOString();
+      endDateTime   = endDate.toISOString();
 
       // ── CHECK DAILY JOB LIMIT (max 3 per day) ───────────────
       const dayStart = `${scheduledDate}T00:00:00`;

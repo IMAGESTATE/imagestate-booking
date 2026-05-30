@@ -279,11 +279,6 @@ module.exports = async (req, res) => {
         `💰 Total Estimate: $${grandTotal}`,
       ].filter(line => line !== null).join('\n');
 
-      console.log('DEBUG scheduledDate:', scheduledDate);
-      console.log('DEBUG scheduledTime:', scheduledTime);
-      console.log('DEBUG startDateTime:', startDateTime);
-      console.log('DEBUG endDateTime:', endDateTime);
-
       await calendar.events.insert({
         calendarId: 'primary',
         sendUpdates: 'all',

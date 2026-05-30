@@ -176,7 +176,6 @@ module.exports = async (req, res) => {
       blockedDates: [...blockedDatesSet],
       slotsByDate,
       today,
-      debug: { totalEvents: events.length, imagestateCount: imagestateEvents.length, hoursUsedByDate }
     });
 
   } catch (error) {

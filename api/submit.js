@@ -31,6 +31,47 @@ module.exports = async (req, res) => {
   const fromEmail = 'cesar@imagestate.homes';
 
   try {
+    // ── CHECK DAILY JOB LIMIT + TIME SLOT CONFLICT (before emails) ──
+    try {
+      const existingEvents = await calendar.events.list({
+        calendarId: 'primary',
+        timeMin: new Date(`${scheduledDate}T00:00:00-07:00`).toISOString(),
+        timeMax: new Date(`${scheduledDate}T23:59:59-07:00`).toISOString(),
+        q: 'IMAGESTATE MEDIA APPT',
+        singleEvents: true,
+      });
+
+      const dayEvents = (existingEvents.data.items || []).filter(e =>
+        e.summary && e.summary.includes('IMAGESTATE MEDIA APPT')
+      );
+
+      // Block if 3 jobs already booked
+      if (dayEvents.length >= 3) {
+        return res.status(409).json({ error: 'This date is fully booked. Please select another date.' });
+      }
+
+      // Block if time slot already taken
+      const [timePart, meridiem] = scheduledTime.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+      if (meridiem === 'PM' && hours !== 12) hours += 12;
+      if (meridiem === 'AM' && hours === 12) hours = 0;
+      const [yr, mo, dy] = scheduledDate.split('-').map(Number);
+      const requestedStart = new Date(Date.UTC(yr, mo - 1, dy, hours + 7, minutes || 0, 0));
+
+      for (const event of dayEvents) {
+        if (event.start.dateTime) {
+          const eventStart = new Date(event.start.dateTime);
+          const diff = Math.abs(requestedStart.getTime() - eventStart.getTime());
+          if (diff < 60 * 60 * 1000) { // within 1 hour = same slot
+            return res.status(409).json({ error: 'This time slot is already booked. Please select a different time.' });
+          }
+        }
+      }
+    } catch (calCheckErr) {
+      console.error('Calendar check error:', calCheckErr);
+      // Don't block submission if calendar check fails — continue
+    }
+
     // ── NOTIFICATION EMAIL TO CESAR ──────────────────────────
     await resend.emails.send({
       from: `IMAGESTATE Bookings <${fromEmail}>`,
@@ -70,6 +111,7 @@ module.exports = async (req, res) => {
                     <div style="font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#00a896;border-bottom:2px solid #00a896;padding-bottom:8px;margin-top:32px;margin-bottom:16px;">Property</div>
                     <table width="100%" cellpadding="6" cellspacing="0">
                       <tr><td style="color:#666;width:140px;">Address</td><td style="font-weight:bold;">${street}, ${city}, CA ${zip}</td></tr>
+                      <tr><td style="color:#666;">Square Footage</td><td>${sqft ? parseInt(sqft).toLocaleString() + ' sqft' : 'Not provided'}</td></tr>
                       <tr><td style="color:#666;">Access Notes</td><td>${accessNotes || 'None'}</td></tr>
                     </table>
 
@@ -161,6 +203,7 @@ module.exports = async (req, res) => {
                     <div style="font-size:13px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#00a896;border-bottom:2px solid #00a896;padding-bottom:8px;margin-bottom:16px;">Your Order Summary</div>
                     <table width="100%" cellpadding="8" cellspacing="0" style="background:#f8f8f8;border-radius:8px;">
                       <tr><td style="color:#666;width:150px;">Property</td><td style="font-weight:bold;">${street}, ${city}</td></tr>
+                      <tr><td style="color:#666;">Square Footage</td><td>${sqft ? parseInt(sqft).toLocaleString() + ' sqft' : 'Not provided'}</td></tr>
                       <tr><td style="color:#666;">Service</td><td>${service}</td></tr>
                       <tr><td style="color:#666;">Requested Date</td><td>${scheduledDate}</td></tr>
                       <tr><td style="color:#666;">Requested Time</td><td>${scheduledTime}</td></tr>
@@ -226,26 +269,7 @@ module.exports = async (req, res) => {
       startDateTime = startDate.toISOString();
       endDateTime   = endDate.toISOString();
 
-      // ── CHECK DAILY JOB LIMIT (max 3 per day) ───────────────
-      const dayStart = `${scheduledDate}T00:00:00`;
-      const dayEnd   = `${scheduledDate}T23:59:59`;
-      const existingEvents = await calendar.events.list({
-        calendarId: 'primary',
-        timeMin: new Date(`${scheduledDate}T00:00:00-07:00`).toISOString(),
-        timeMax: new Date(`${scheduledDate}T23:59:59-07:00`).toISOString(),
-        q: 'IMAGESTATE MEDIA APPT',
-        singleEvents: true,
-      });
-      const jobCount = (existingEvents.data.items || []).filter(e =>
-        e.summary && e.summary.includes('IMAGESTATE MEDIA APPT')
-      ).length;
-
-      if (jobCount >= 3) {
-        return res.status(200).json({ success: true, calendarFull: true });
-      }
-
-
-      const accessLines = [];
+      // Build access code lines
       if (doorCode)    accessLines.push(`Front door code: ${doorCode}`);
       if (gateCode)    accessLines.push(`Gate code: ${gateCode}`);
       if (comboCode)   accessLines.push(`Combo box: ${comboCode}`);

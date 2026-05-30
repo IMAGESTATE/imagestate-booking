@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
     addons, addonTotal, scheduledDate, scheduledTime,
     specialNotes, grandTotal,
     doorCode, gateCode, comboCode,
-    sqft
+    sqft, packageId
   } = req.body;
 
   const clientName = `${firstName} ${lastName}`;

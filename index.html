@@ -705,6 +705,10 @@ function validatePage4() {
 function nextPage() {
   if (currentPage === 1) { if (!validatePage1()) return; buildPackages(); }
   if (currentPage === 2) { if (!selectedPackageId) { alert('Please select a package to continue.'); return; } buildAddons(); }
+  if (currentPage === 3) {
+    // Refresh availability fresh right before showing the calendar
+    refreshAvailability();
+  }
   if (currentPage === 4) { if (!validatePage4()) return; populateReview(); }
   if (currentPage === 5) { submitForm(); return; }
   showPage(currentPage + 1);
@@ -877,13 +881,38 @@ function renderTimeSlots(dateStr) {
 function calPrev() {
   calMonth--;
   if (calMonth < 0) { calMonth = 11; calYear--; }
-  renderCalendar();
+  refreshAvailability();
 }
 
 function calNext() {
   calMonth++;
   if (calMonth > 11) { calMonth = 0; calYear++; }
+  refreshAvailability();
+}
+
+async function refreshAvailability() {
+  // Show loading state on calendar
+  const grid = document.getElementById('calGrid');
+  if (grid) {
+    grid.style.opacity = '0.4';
+    grid.style.pointerEvents = 'none';
+  }
+  try {
+    const r = await fetch('/api/availability?t=' + Date.now()); // cache-bust
+    const d = await r.json();
+    availData = d;
+    fullyBookedDates = d.fullyBooked || [];
+    slotsByDate = d.slotsByDate || {};
+  } catch(e) {
+    // Keep existing data if refresh fails
+  }
+  if (grid) {
+    grid.style.opacity = '1';
+    grid.style.pointerEvents = '';
+  }
   renderCalendar();
+  // If a date was already selected, re-render its time slots with fresh data
+  if (selectedDateStr) renderTimeSlots(selectedDateStr);
 }
 
 function selectTime(slot) {

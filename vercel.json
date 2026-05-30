@@ -1,1 +1,6 @@
-{"version":2,"builds":[{"src":"api/submit.js","use":"@vercel/node"},{"src":"index.html","use":"@vercel/static"}],"routes":[{"src":"/api/submit","dest":"/api/submit.js"},{"src":"/(.*)","dest":"/index.html"}]}
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

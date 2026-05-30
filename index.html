@@ -766,7 +766,7 @@ async function loadAvailability() {
   const dbg = document.getElementById('debugOutput');
   if (dbg) {
     dbg.style.display = 'block';
-    dbg.textContent = 'fullyBooked: ' + JSON.stringify(availData.fullyBooked) + ' | slotsByDate: ' + JSON.stringify(availData.slotsByDate);
+    dbg.textContent = 'fullyBooked: ' + JSON.stringify(availData.fullyBooked) + ' | slots: ' + JSON.stringify(availData.slotsByDate) + ' | blocked: ' + (availData.blockedDates||[]).length + ' | today: ' + availData.today;
   }
   renderCalendar();
 }
@@ -919,7 +919,7 @@ async function refreshAvailability() {
   const dbg = document.getElementById('debugOutput');
   if (dbg) {
     dbg.style.display = 'block';
-    dbg.textContent = 'fullyBooked: ' + JSON.stringify(availData.fullyBooked) + ' | slotsByDate: ' + JSON.stringify(availData.slotsByDate);
+    dbg.textContent = 'fullyBooked: ' + JSON.stringify(availData.fullyBooked) + ' | slots: ' + JSON.stringify(availData.slotsByDate) + ' | blocked: ' + (availData.blockedDates||[]).length + ' | today: ' + availData.today;
   }
   renderCalendar();
   // If a date was already selected, re-render its time slots with fresh data

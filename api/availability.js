@@ -86,6 +86,8 @@ module.exports = async (req, res) => {
     });
 
     const events = response.data.items || [];
+    console.log('Total events fetched:', events.length);
+    console.log('Event summaries:', events.map(e => e.summary + ' | ' + (e.start.dateTime || e.start.date)).join(', '));
     const imagestateEvents = events.filter(e => e.summary && e.summary.includes('IMAGESTATE MEDIA APPT'));
     const blockerEvents    = events.filter(e => {
       if (!e.summary || !e.summary.includes('IMAGESTATE MEDIA APPT')) {

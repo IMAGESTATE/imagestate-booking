@@ -1,5 +1,15 @@
 const { Resend } = require('resend');
+const { google } = require('googleapis');
+
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  'https://developers.google.com/oauthplayground'
+);
+oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -12,7 +22,9 @@ module.exports = async (req, res) => {
     service, photoPrice, videoPrice,
     stagingPrice, floorPrice, tourPrice,
     addons, addonTotal, scheduledDate, scheduledTime,
-    specialNotes, grandTotal
+    specialNotes, grandTotal,
+    doorCode, gateCode, comboCode,
+    sqft, isTwilight
   } = req.body;
 
   const clientName = `${firstName} ${lastName}`;
@@ -196,6 +208,86 @@ module.exports = async (req, res) => {
         </html>
       `
     });
+
+    // ── GOOGLE CALENDAR EVENT ────────────────────────────────
+    try {
+      let startDateTime, endDateTime;
+
+      if (isTwilight) {
+        // Twilight: placeholder 6pm–7pm block
+        const [year, month, day] = scheduledDate.split('-');
+        startDateTime = new Date(`${year}-${month}-${day}T18:00:00`);
+        endDateTime   = new Date(`${year}-${month}-${day}T19:00:00`);
+      } else {
+        // Parse selected time e.g. "9:00 AM"
+        const [timePart, meridiem] = scheduledTime.split(' ');
+        let [hours, minutes] = timePart.split(':').map(Number);
+        if (meridiem === 'PM' && hours !== 12) hours += 12;
+        if (meridiem === 'AM' && hours === 12) hours = 0;
+        const [year, month, day] = scheduledDate.split('-');
+        startDateTime = new Date(`${year}-${month}-${day}T${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:00`);
+        endDateTime   = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+      }
+
+      // Build access code lines
+      const accessLines = [];
+      if (doorCode)    accessLines.push(`Front door code: ${doorCode}`);
+      if (gateCode)    accessLines.push(`Gate code: ${gateCode}`);
+      if (comboCode)   accessLines.push(`Combo box: ${comboCode}`);
+      if (accessNotes) accessLines.push(`Access notes: ${accessNotes}`);
+
+      const serviceList = [
+        photoPrice   > 0 ? `Photography ($${photoPrice})`     : null,
+        videoPrice   > 0 ? `Videography ($${videoPrice})`     : null,
+        stagingPrice > 0 ? `Virtual Staging ($${stagingPrice})` : null,
+        floorPrice   > 0 ? `Floor Plan ($${floorPrice})`      : null,
+        tourPrice    > 0 ? `Virtual Tour ($${tourPrice})`     : null,
+        addons             ? `${addons} (+$${addonTotal})`    : null,
+      ].filter(Boolean).join(', ');
+
+      const description = [
+        `📋 BOOKING DETAILS`,
+        ``,
+        `Client: ${clientName}`,
+        `Email: ${email}`,
+        `Phone: ${phone}`,
+        `Attending shoot: ${attending}`,
+        ``,
+        `📦 Package: ${service}`,
+        sqft ? `📐 Square Footage: ${sqft} sqft` : null,
+        serviceList ? `✨ Services: ${serviceList}` : null,
+        isTwilight ? `🌅 Twilight shoot — time TBD, coordinate with client` : null,
+        specialNotes ? `📝 Notes: ${specialNotes}` : null,
+        ``,
+        accessLines.length > 0 ? `🔑 ACCESS CODES` : null,
+        ...accessLines,
+        ``,
+        `💰 Total Estimate: $${grandTotal}`,
+      ].filter(line => line !== null).join('\n');
+
+      await calendar.events.insert({
+        calendarId: 'primary',
+        sendUpdates: 'all',
+        resource: {
+          summary: `IMAGESTATE MEDIA APPT – ${street}, ${city}`,
+          location: `${street}, ${city}, CA ${zip}`,
+          description,
+          start: { dateTime: startDateTime.toISOString(), timeZone: 'America/Los_Angeles' },
+          end:   { dateTime: endDateTime.toISOString(),   timeZone: 'America/Los_Angeles' },
+          attendees: [{ email, displayName: clientName }],
+          reminders: {
+            useDefault: false,
+            overrides: [
+              { method: 'popup', minutes: 60 },
+              { method: 'email', minutes: 24 * 60 },
+            ],
+          },
+        },
+      });
+    } catch (calErr) {
+      // Don't fail the whole request if calendar errors — emails already sent
+      console.error('Calendar error:', calErr);
+    }
 
     return res.status(200).json({ success: true });
 

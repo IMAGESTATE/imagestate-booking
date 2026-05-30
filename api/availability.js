@@ -157,7 +157,14 @@ module.exports = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Availability error:', error);
-    return res.status(500).json({ error: 'Failed to fetch availability', fullyBooked: [], blockedDates: [], slotsByDate: {}, today: '' });
+    console.error('Availability error:', error.message, error.code);
+    return res.status(200).json({ 
+      error: error.message,
+      fullyBooked: [], 
+      blockedDates: [], 
+      slotsByDate: {}, 
+      today: new Date().toISOString().substring(0,10),
+      debug: 'API error: ' + error.message
+    });
   }
 };

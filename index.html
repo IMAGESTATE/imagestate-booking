@@ -359,6 +359,7 @@
         <span class="legend-item"><span class="legend-dot booked"></span> Fully Booked</span>
         <span class="legend-item"><span class="legend-dot blocked"></span> Unavailable</span>
       </div>
+      <div id="debugOutput" style="padding:12px;font-size:11px;color:#666;background:#f8f9fc;border-top:1px solid #eee;word-break:break-all;display:none;"></div>
     </div>
 
     <div class="field-error" id="err-date" style="margin-top:8px;">Please select a date</div>
@@ -763,6 +764,12 @@ async function loadAvailability() {
   const now = new Date();
   calYear  = now.getFullYear();
   calMonth = now.getMonth();
+  // Temporary debug display
+  const dbg = document.getElementById('debugOutput');
+  if (dbg) {
+    dbg.style.display = 'block';
+    dbg.textContent = 'fullyBooked: ' + JSON.stringify(availData.fullyBooked) + ' | slotsByDate: ' + JSON.stringify(availData.slotsByDate);
+  }
   renderCalendar();
 }
 
@@ -909,6 +916,12 @@ async function refreshAvailability() {
   if (grid) {
     grid.style.opacity = '1';
     grid.style.pointerEvents = '';
+  }
+  // Temporary debug display
+  const dbg = document.getElementById('debugOutput');
+  if (dbg) {
+    dbg.style.display = 'block';
+    dbg.textContent = 'fullyBooked: ' + JSON.stringify(availData.fullyBooked) + ' | slotsByDate: ' + JSON.stringify(availData.slotsByDate);
   }
   renderCalendar();
   // If a date was already selected, re-render its time slots with fresh data

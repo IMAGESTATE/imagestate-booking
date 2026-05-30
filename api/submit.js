@@ -278,6 +278,7 @@ module.exports = async (req, res) => {
       endDateTime   = endDate.toISOString();
 
       // Build access code lines
+      const accessLines = [];
       if (doorCode)    accessLines.push(`Front door code: ${doorCode}`);
       if (gateCode)    accessLines.push(`Gate code: ${gateCode}`);
       if (comboCode)   accessLines.push(`Combo box: ${comboCode}`);

@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
     addons, addonTotal, scheduledDate, scheduledTime,
     specialNotes, grandTotal,
     doorCode, gateCode, comboCode,
-    sqft, isTwilight
+    sqft
   } = req.body;
 
   const clientName = `${firstName} ${lastName}`;
@@ -213,23 +213,36 @@ module.exports = async (req, res) => {
     try {
       let startDateTime, endDateTime;
 
-      if (isTwilight) {
-        // Twilight: placeholder 6pm–7pm block
-        const [year, month, day] = scheduledDate.split('-');
-        startDateTime = new Date(`${year}-${month}-${day}T18:00:00`);
-        endDateTime   = new Date(`${year}-${month}-${day}T19:00:00`);
-      } else {
-        // Parse selected time e.g. "9:00 AM"
-        const [timePart, meridiem] = scheduledTime.split(' ');
-        let [hours, minutes] = timePart.split(':').map(Number);
-        if (meridiem === 'PM' && hours !== 12) hours += 12;
-        if (meridiem === 'AM' && hours === 12) hours = 0;
-        const [year, month, day] = scheduledDate.split('-');
-        startDateTime = new Date(`${year}-${month}-${day}T${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:00`);
-        endDateTime   = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+      // Parse selected time e.g. "9:00 AM"
+      const [timePart, meridiem] = scheduledTime.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+      if (meridiem === 'PM' && hours !== 12) hours += 12;
+      if (meridiem === 'AM' && hours === 12) hours = 0;
+      const startHH = String(hours).padStart(2, '0');
+      const startMM = String(minutes || 0).padStart(2, '0');
+      const endHH = String(hours + 1).padStart(2, '0');
+      startDateTime = `${scheduledDate}T${startHH}:${startMM}:00`;
+      endDateTime   = `${scheduledDate}T${endHH}:${startMM}:00`;
+
+      // ── CHECK DAILY JOB LIMIT (max 3 per day) ───────────────
+      const dayStart = `${scheduledDate}T00:00:00`;
+      const dayEnd   = `${scheduledDate}T23:59:59`;
+      const existingEvents = await calendar.events.list({
+        calendarId: 'primary',
+        timeMin: new Date(`${scheduledDate}T00:00:00-07:00`).toISOString(),
+        timeMax: new Date(`${scheduledDate}T23:59:59-07:00`).toISOString(),
+        q: 'IMAGESTATE MEDIA APPT',
+        singleEvents: true,
+      });
+      const jobCount = (existingEvents.data.items || []).filter(e =>
+        e.summary && e.summary.includes('IMAGESTATE MEDIA APPT')
+      ).length;
+
+      if (jobCount >= 3) {
+        return res.status(200).json({ success: true, calendarFull: true });
       }
 
-      // Build access code lines
+
       const accessLines = [];
       if (doorCode)    accessLines.push(`Front door code: ${doorCode}`);
       if (gateCode)    accessLines.push(`Gate code: ${gateCode}`);
@@ -256,7 +269,6 @@ module.exports = async (req, res) => {
         `📦 Package: ${service}`,
         sqft ? `📐 Square Footage: ${sqft} sqft` : null,
         serviceList ? `✨ Services: ${serviceList}` : null,
-        isTwilight ? `🌅 Twilight shoot — time TBD, coordinate with client` : null,
         specialNotes ? `📝 Notes: ${specialNotes}` : null,
         ``,
         accessLines.length > 0 ? `🔑 ACCESS CODES` : null,
@@ -272,8 +284,8 @@ module.exports = async (req, res) => {
           summary: `IMAGESTATE MEDIA APPT – ${street}, ${city}`,
           location: `${street}, ${city}, CA ${zip}`,
           description,
-          start: { dateTime: startDateTime.toISOString(), timeZone: 'America/Los_Angeles' },
-          end:   { dateTime: endDateTime.toISOString(),   timeZone: 'America/Los_Angeles' },
+          start: { dateTime: startDateTime, timeZone: 'America/Los_Angeles' },
+          end:   { dateTime: endDateTime,   timeZone: 'America/Los_Angeles' },
           attendees: [{ email, displayName: clientName }],
           reminders: {
             useDefault: false,

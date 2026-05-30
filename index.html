@@ -169,6 +169,13 @@
 
   .field-input:focus { border-color: var(--navy); }
 
+  .date-fully-booked-note {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #e05252;
+    display: none;
+  }
+
   .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1335,26 +1342,22 @@
 
     <div class="field-group">
       <label class="field-label">Preferred Date *</label>
-      <input class="field-input" id="scheduledDate" type="date">
+      <input class="field-input" id="scheduledDate" type="date" onchange="checkDateAvailability(this.value)">
+      <div class="date-fully-booked-note" id="dateBookedNote">⚠️ This date is fully booked. Please select another date.</div>
     </div>
 
     <div class="field-group">
       <label class="field-label">Preferred Time *</label>
-      <div id="timeSlotContainer">
-        <div class="schedule-grid">
-          <div class="time-slot" onclick="selectTime(this)" data-time="8:00 AM">8:00 AM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="9:00 AM">9:00 AM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="10:00 AM">10:00 AM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="11:00 AM">11:00 AM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="12:00 PM">12:00 PM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="1:00 PM">1:00 PM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="2:00 PM">2:00 PM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="3:00 PM">3:00 PM</div>
-          <div class="time-slot" onclick="selectTime(this)" data-time="4:00 PM">4:00 PM</div>
-        </div>
-      </div>
-      <div id="twilightTimeNote" style="display:none; background:#042752; color:rgba(255,255,255,0.8); border-radius:8px; padding:14px 16px; font-size:13px; line-height:1.6;">
-        🌅 <strong style="color:#00a896;">Twilight Session</strong> — Your shoot time will be coordinated directly with you based on sunset. No time selection needed.
+      <div class="schedule-grid">
+        <div class="time-slot" onclick="selectTime(this)" data-time="8:00 AM">8:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="9:00 AM">9:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="10:00 AM">10:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="11:00 AM">11:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="12:00 PM">12:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="1:00 PM">1:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="2:00 PM">2:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="3:00 PM">3:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)" data-time="4:00 PM">4:00 PM</div>
       </div>
     </div>
 
@@ -1488,18 +1491,34 @@
       if (idx > -1) addonNames.splice(idx, 1);
     }
     updateTotal();
-    updateTwilightUI();
   }
 
-  function updateTwilightUI() {
-    const isTwilight = addonNames.includes('Twilight Session');
-    const timeSlotContainer = document.getElementById('timeSlotContainer');
-    const twilightNote = document.getElementById('twilightTimeNote');
-    if (timeSlotContainer && twilightNote) {
-      timeSlotContainer.style.display = isTwilight ? 'none' : 'block';
-      twilightNote.style.display = isTwilight ? 'block' : 'none';
+  // Fetch booked-out dates on page load
+  let fullyBookedDates = [];
+
+  async function loadAvailability() {
+    try {
+      const res = await fetch('/api/availability');
+      const data = await res.json();
+      fullyBookedDates = data.fullyBooked || [];
+    } catch (e) {
+      fullyBookedDates = [];
     }
   }
+
+  function checkDateAvailability(dateVal) {
+    const note = document.getElementById('dateBookedNote');
+    const input = document.getElementById('scheduledDate');
+    if (fullyBookedDates.includes(dateVal)) {
+      note.style.display = 'block';
+      input.style.borderColor = '#e05252';
+    } else {
+      note.style.display = 'none';
+      input.style.borderColor = '#dde0ea';
+    }
+  }
+
+  loadAvailability();
 
   function selectTime(slot) {
     document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
@@ -1609,13 +1628,13 @@
     const gateCode    = document.getElementById('gateCode').value.trim();
     const comboCode   = document.getElementById('comboCode').value.trim();
 
-    const isTwilight = addonNames.includes('Twilight Session');
+    const isTwilight  = false; // removed — Cesar coordinates twilight times manually
 
     const serviceCard = document.querySelector('.service-card.selected');
     const service = serviceCard ? serviceCard.querySelector('.service-name').textContent : 'Not selected';
 
     const timeSlot = document.querySelector('.time-slot.selected');
-    const scheduledTime = isTwilight ? 'Twilight – TBD' : (timeSlot ? timeSlot.dataset.time : 'Not selected');
+    const scheduledTime = timeSlot ? timeSlot.dataset.time : 'Not selected';
 
     const grandTotal = Object.values(prices).reduce((a, b) => a + b, 0);
 
@@ -1632,8 +1651,7 @@
       addonTotal:   prices.addons,
       scheduledDate, scheduledTime, specialNotes,
       grandTotal,
-      doorCode, gateCode, comboCode, sqft,
-      isTwilight
+      doorCode, gateCode, comboCode, sqft
     };
 
     try {
@@ -1661,6 +1679,14 @@
     if (currentPage === 11) {
       submitForm();
       return;
+    }
+    // Block progression if selected date is fully booked
+    if (currentPage === 10) {
+      const dateVal = document.getElementById('scheduledDate').value;
+      if (dateVal && fullyBookedDates.includes(dateVal)) {
+        document.getElementById('dateBookedNote').style.display = 'block';
+        return;
+      }
     }
     if (idx < seq.length - 1) {
       showPage(seq[idx + 1]);

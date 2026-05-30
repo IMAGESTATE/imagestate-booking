@@ -106,8 +106,29 @@
   .package-check svg { opacity: 0; transition: opacity 0.2s; }
   .package-card.selected .package-check svg { opacity: 1; }
 
-  .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .addon-section-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--navy); font-weight: 500; margin: 28px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--gold); display: inline-block; }
+  .addon-section-title:first-child { margin-top: 0; }
+  .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
   .addon-card { background: var(--white); border: 1.5px solid #dde0ea; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: flex-start; gap: 10px; }
+
+  .pkg-toggle {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; color: var(--gold); margin-top: 10px;
+    cursor: pointer; user-select: none; font-weight: 500;
+    background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif;
+  }
+  .pkg-toggle:hover { color: var(--gold-light); }
+  .pkg-toggle .arrow { transition: transform 0.2s; display: inline-block; }
+  .pkg-toggle.open .arrow { transform: rotate(180deg); }
+
+  .pkg-details {
+    display: none; margin-top: 12px;
+    background: #f8f9fc; border-radius: 8px; padding: 14px 16px;
+  }
+  .pkg-details.open { display: block; }
+  .pkg-details ul { list-style: none; padding: 0; margin: 0; }
+  .pkg-details ul li { font-size: 13px; color: #4a5568; line-height: 1.6; padding: 3px 0; display: flex; align-items: flex-start; gap: 8px; }
+  .pkg-details ul li::before { content: '✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
   .addon-card:hover { border-color: var(--navy); }
   .addon-card.selected { border-color: var(--navy); background: #f0f2f8; }
   .addon-check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #dde0ea; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; transition: all 0.2s; }
@@ -282,7 +303,7 @@
     <div class="page-num">Step 3 of 5</div>
     <h1 class="page-title">Enhance your order.</h1>
     <p class="page-sub">Optional add-ons to complement your package. All delivered with your final media.</p>
-    <div class="addon-grid" id="addonGrid"></div>
+    <div id="addonGrid"></div>
   </div>
 </div>
 
@@ -438,15 +459,19 @@ function buildPackages() {
     return '<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>';
   }
 
-  function pkgCard(cls, id, price, name, badgeCls, badgeLabel, desc, tags, origPrice, savings) {
+  function pkgCard(cls, id, price, name, badgeCls, badgeLabel, shortDesc, tags, origPrice, savings, bullets) {
     const savingsHtml = savings ? '<div class="package-original">$' + origPrice + '</div><div class="package-price">$' + price + '</div><div class="package-savings">Save $' + savings + '</div>' : '<div class="package-price">$' + price + '</div>';
-    return '<div class="package-card ' + cls + '" onclick="selectPackage(this,\'' + id + '\',' + price + ',\'' + name + '\')">' +
+    const uid = 'pkg-' + id;
+    const bulletHtml = bullets.map(b => '<li>' + b + '</li>').join('');
+    return '<div class="package-card ' + cls + '" onclick="selectPackage(this,\'' + id + '\',' + price + ',\'' + name + '\')" id="card-' + id + '">' +
       '<div class="package-top">' +
         '<div class="package-left">' +
           '<div class="package-badge ' + badgeCls + '">' + badgeLabel + '</div>' +
           '<div class="package-name">' + name + '</div>' +
-          '<div class="package-includes">' + desc + '</div>' +
+          '<div class="package-includes">' + shortDesc + '</div>' +
           '<div class="package-tags">' + tags.map(t => '<span class="pkg-tag">' + t + '</span>').join('') + '</div>' +
+          '<button class="pkg-toggle" id="toggle-' + id + '" onclick="toggleDetails(event,\'' + uid + '\',\'' + id + '\')">▼ <span class="arrow-label">See what\'s included</span> <span class="arrow">▾</span></button>' +
+          '<div class="pkg-details" id="' + uid + '"><ul>' + bulletHtml + '</ul></div>' +
         '</div>' +
         '<div class="package-right"><div>' + savingsHtml + '</div>' +
         '<div class="package-check">' + checkSVG() + '</div></div>' +
@@ -455,31 +480,74 @@ function buildPackages() {
 
   grid.innerHTML =
     pkgCard('', 'photos-only', p.photoPrice, 'Photos Only', 'badge-standard', 'Photography',
-      'HDR interior & exterior + aerial. 24-hr delivery.',
-      ['HDR Photos','Aerial Included','24hr Delivery'], 0, 0) +
+      'Professional HDR photos + aerial. Delivered in 24 hours.',
+      ['HDR Photos','Aerial Included','24hr Delivery'], 0, 0, [
+        'Full HDR interior & exterior photography using advanced multi-exposure blending for true-to-life colors and depth',
+        'Aerial drone photography showcasing the property, lot, and surrounding area (subject to FAA airspace availability)',
+        'Professional sky replacement on exterior shots when needed',
+        'All images delivered in high-resolution MLS-ready format within 24 hours',
+        'Online gallery with download link sent directly to your email',
+      ]) +
 
     pkgCard('', 'video-only', p.videoPrice, 'Videography Only', 'badge-standard', 'Videography',
-      'Cinematic listing video + aerial footage. 48-hr delivery.',
-      ['Cinematic Edit','Aerial Included','Licensed Music'], 0, 0) +
+      'Cinematic listing video + aerial footage. Delivered in 48 hours.',
+      ['Cinematic Edit','Aerial Included','Licensed Music'], 0, 0, [
+        'Professionally edited cinematic walkthrough video shot with cinema-grade equipment',
+        'Smooth gimbal-stabilized interior and exterior footage for a polished, high-end look',
+        'Aerial drone footage integrated into the final edit for dramatic property reveals',
+        'Licensed background music selected to match the property\'s style and atmosphere',
+        'Final video optimized for MLS, social media, and YouTube — delivered within 48 hours',
+      ]) +
 
     pkgCard('popular', 'photo-video', p.photoVideo, 'Photos + Video Bundle', 'badge-popular', '⭐ Most Popular',
       'HDR photos & cinematic video in one shoot. Priority delivery.',
       ['HDR Photos','Cinematic Video','Aerial Included','Priority Delivery'],
-      origPhotoVideo, origPhotoVideo - p.photoVideo) +
+      origPhotoVideo, origPhotoVideo - p.photoVideo, [
+        'Everything in Photos Only + Videography Only — captured in a single efficient shoot',
+        'Full HDR photography with advanced multi-exposure blending and aerial shots',
+        'Cinematic walkthrough video with stabilized footage, aerial integration & licensed music',
+        'Priority editing — both photos and video delivered faster than booking separately',
+        'Coordinated delivery: photos and video sent together so your listing launches complete',
+        'Save ' + (origPhotoVideo - p.photoVideo) + ' vs booking each service individually',
+      ]) +
 
     pkgCard('', 'photo-video-floor', p.photoVideoFloor, 'Photos + Video + Floor Plan', 'badge-best', '🏆 Best Value',
-      'Complete listing package. Everything agents need for MLS.',
+      'Complete listing package with everything agents need for MLS.',
       ['HDR Photos','Cinematic Video','Floor Plan','Aerial Included'],
-      origPhotoVideoFloor, origPhotoVideoFloor - p.photoVideoFloor) +
+      origPhotoVideoFloor, origPhotoVideoFloor - p.photoVideoFloor, [
+        'Everything in the Photos + Video Bundle',
+        'Professionally measured 2D floor plan delivered as PNG & JPG — MLS ready',
+        'Floor plan shows accurate room layout, dimensions, and fixed features like stairs and doors',
+        'Helps buyers understand property flow before ever stepping inside — proven to increase inquiries',
+        'All three assets delivered together for a complete, launch-ready listing package',
+        'Save $' + (origPhotoVideoFloor - p.photoVideoFloor) + ' vs booking each service individually',
+      ]) +
 
     pkgCard('luxury-card', 'full-estate', p.fullEstate, 'Full Estate Package', 'badge-luxury', '✦ Full Estate',
-      'Photos + Video + Floor Plan + Real Twilight Session. Maximum listing impact.',
+      'Photos + Video + Floor Plan + Real Twilight Session.',
       ['HDR Photos','Cinematic Video','Floor Plan','Twilight Session','Aerial Included'],
-      origFull, origFull - p.fullEstate);
+      origFull, origFull - p.fullEstate, [
+        'Everything in Photos + Video + Floor Plan',
+        'Real twilight/golden hour exterior session — the most impactful listing photos possible',
+        'Twilight shoot time is coordinated directly with you based on sunset for perfect lighting',
+        'Warm glowing windows, dramatic sky, and ambient lighting make the property unforgettable',
+        'The complete listing media package used by top-producing agents in the Coachella Valley',
+        'Save $' + (origFull - p.fullEstate) + ' vs booking each service individually',
+      ]);
 
   const tierNames = { standard:'Standard', premium:'Premium', luxury:'Luxury Estate' };
   document.getElementById('packageSubtext').textContent =
     tierNames[p.tier] + ' pricing for your ' + parseInt(sqft).toLocaleString() + ' sqft property. All packages include aerial drone photography, subject to FAA airspace availability.';
+}
+
+function toggleDetails(event, uid, id) {
+  event.stopPropagation();
+  const details = document.getElementById(uid);
+  const toggle  = document.getElementById('toggle-' + id);
+  const isOpen  = details.classList.contains('open');
+  details.classList.toggle('open');
+  toggle.classList.toggle('open');
+  toggle.querySelector('.arrow-label').textContent = isOpen ? "See what's included" : "Hide details";
 }
 
 function selectPackage(card, id, price, name) {
@@ -495,39 +563,53 @@ function selectPackage(card, id, price, name) {
 function buildAddons() {
   const sqft = document.getElementById('sqft').value;
   const p    = getPricing(sqft);
-  const grid = document.getElementById('addonGrid');
-  const hasVideo   = selectedPackageId && selectedPackageId.includes('video');
-  const hasFloor   = selectedPackageId && selectedPackageId.includes('floor');
+  const container = document.getElementById('addonGrid');
+  const hasVideo    = selectedPackageId && selectedPackageId.includes('video');
+  const hasFloor    = selectedPackageId && selectedPackageId.includes('floor');
   const hasTwilight = selectedPackageId === 'full-estate';
 
-  const addons = [
-    { name:'Twilight Session',      desc:'Real golden hour + dusk exterior. Time coordinated with you.', price:p.twilightPrice, show:!hasTwilight },
-    { name:'Virtual Twilight ×1',   desc:'AI-generated dusk from daytime photo',                         price:79,  show:true },
-    { name:'Virtual Twilight ×2',   desc:'Two AI-generated dusk images',                                 price:139, show:true },
-    { name:'Virtual Staging ×1',    desc:'Virtually furnish 1 empty room',                               price:79,  show:true },
-    { name:'Virtual Staging ×3',    desc:'Most popular for vacant listings',                             price:189, show:true },
-    { name:'Virtual Staging ×5',    desc:'Full vacant home transformation',                              price:249, show:true },
-    { name:'Floor Plan',            desc:'2D floor plan for MLS — priced to your sqft',                  price:p.floorPrice, show:!hasFloor },
-    { name:'360 Virtual Tour',      desc:'Immersive virtual walkthrough for your listing',               price:p.tourPrice, show:true },
-    { name:'Feature Detail Shots',  desc:'Close-up lifestyle details for luxury & vacation rentals',     price:149, show:true },
-    { name:'Community Area Shots',  desc:'Pool, clubhouse, amenity areas',                               price:99,  show:true },
-    { name:'Grass Addition',        desc:'Virtual grass for dead or patchy lawns',                       price:69,  show:true },
-    { name:'Rush Processing',       desc:'Next morning delivery by 9am',                                 price:149, show:true },
-    { name:'Slideshow Video',       desc:'Branded photo slideshow for social media',                     price:149, show:true },
-    { name:'Branded Video',         desc:'Add your logo, contact info & title cards',                    price:99,  show:hasVideo },
-    { name:'Agent On Camera',       desc:'Professional on-camera presence',                              price:199, show:hasVideo },
-    { name:'Extra Video Minutes',   desc:'Extend final edit beyond standard length',                     price:149, show:hasVideo },
-  ].filter(a => a.show);
-
-  grid.innerHTML = addons.map(a =>
-    '<div class="addon-card" onclick="toggleAddon(this,' + a.price + ')" data-name="' + a.name + '">' +
+  function addonCard(name, desc, price) {
+    return '<div class="addon-card" onclick="toggleAddon(this,' + price + ')" data-name="' + name + '">' +
       '<div class="addon-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div>' +
-      '<div class="addon-info">' +
-        '<div class="addon-name">' + a.name + '</div>' +
-        '<div class="addon-desc">' + a.desc + '</div>' +
-        '<div class="addon-price">$' + a.price + '</div>' +
-      '</div></div>'
-  ).join('');
+      '<div class="addon-info"><div class="addon-name">' + name + '</div><div class="addon-desc">' + desc + '</div><div class="addon-price">$' + price + '</div></div></div>';
+  }
+
+  function section(title, cards) {
+    const visible = cards.filter(c => c.show);
+    if (!visible.length) return '';
+    return '<div class="addon-section-title">' + title + '</div>' +
+      '<div class="addon-grid">' + visible.map(c => addonCard(c.name, c.desc, c.price)).join('') + '</div>';
+  }
+
+  const photoAddons = [
+    { name:'Twilight Session',     desc:'A dedicated golden hour shoot capturing warm glowing windows, dramatic skies, and ambient exterior lighting. The single most impactful add-on for luxury and high-end listings.', price:p.twilightPrice, show:!hasTwilight },
+    { name:'Virtual Twilight ×1',  desc:'One daytime exterior photo digitally transformed into a stunning dusk image — pool lighting, warm windows, and golden sky added in post. Fast and cost-effective alternative to a real shoot.', price:79, show:true },
+    { name:'Virtual Twilight ×2',  desc:'Two daytime exterior photos transformed into dusk images. Ideal for front and back of property, or two different angles of the same facade.', price:139, show:true },
+    { name:'Virtual Staging ×1',   desc:'One empty room virtually furnished with high-end, realistic furniture and décor. Helps buyers visualize the space and increases online engagement on vacant listings.', price:79, show:true },
+    { name:'Virtual Staging ×3',   desc:'Three empty rooms virtually staged — the most popular option for vacant listings. Great for living room, master bedroom, and one additional space.', price:189, show:true },
+    { name:'Virtual Staging ×5',   desc:'Five rooms virtually staged — ideal for fully vacant homes. Transforms an empty property into a fully furnished, buyer-ready listing at a fraction of physical staging cost.', price:249, show:true },
+    { name:'Feature Detail Shots', desc:'Macro and lifestyle close-up shots highlighting premium finishes — think countertops, hardware, tile work, fireplaces, and architectural details. Essential for luxury and vacation rental listings.', price:149, show:true },
+    { name:'Community Area Shots', desc:'Aerial and ground-level photos of shared amenities — pool, clubhouse, tennis courts, gym, and common areas. Requires prior authorization from the HOA or community management.', price:99, show:true },
+    { name:'Grass Addition',       desc:'Dead, brown, or patchy grass digitally replaced with lush green lawn in exterior photos. A quick edit that dramatically improves curb appeal on desert and transitional properties.', price:69, show:true },
+    { name:'Rush Processing',      desc:'Need your media fast? Rush processing guarantees next-morning delivery by 9am — perfect for same-day listing launches or last-minute open house prep.', price:149, show:true },
+  ];
+
+  const generalAddons = [
+    { name:'Floor Plan',       desc:'Professionally drawn 2D floor plan showing accurate room layout, dimensions, and fixed features. Delivered as PNG and JPG. Proven to increase buyer inquiries by helping them understand property flow before visiting.', price:p.floorPrice, show:!hasFloor },
+    { name:'360 Virtual Tour', desc:'An immersive, interactive virtual walkthrough that lets buyers explore every room online as if they were there. Embedded on MLS, Zillow, and your website — reduces wasted showings and attracts serious buyers.', price:p.tourPrice, show:true },
+    { name:'Slideshow Video',  desc:'A branded photo slideshow video built from your listing photos — complete with your logo, contact info, and licensed music. Ready to post on Instagram, Facebook, and YouTube the same day photos are delivered.', price:149, show:true },
+  ];
+
+  const videoAddons = [
+    { name:'Branded Video',       desc:'Your logo, contact information, brokerage name, and custom title cards professionally added to your listing video. Turns a great video into a personal marketing asset you can use across all platforms.', price:99, show:hasVideo },
+    { name:'Agent On Camera',     desc:'You, on screen. A professionally filmed agent intro or walkthrough narration is edited into the video — building your personal brand and connecting buyers directly to you before the showing.', price:199, show:hasVideo },
+    { name:'Extra Video Minutes', desc:'Need more time to tell the story? This extends your final edited video beyond the standard length — ideal for large properties, luxury estates, or listings with exceptional outdoor spaces that deserve more screen time.', price:149, show:hasVideo },
+  ];
+
+  container.innerHTML =
+    section('📸 Photography Add-Ons', photoAddons) +
+    section('📋 General Add-Ons', generalAddons) +
+    (hasVideo ? section('🎬 Video Add-Ons', videoAddons) : '');
 }
 
 function toggleAddon(card, price) {

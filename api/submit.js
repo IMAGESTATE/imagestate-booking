@@ -218,11 +218,12 @@ module.exports = async (req, res) => {
       let [hours, minutes] = timePart.split(':').map(Number);
       if (meridiem === 'PM' && hours !== 12) hours += 12;
       if (meridiem === 'AM' && hours === 12) hours = 0;
-      const startHH = String(hours).padStart(2, '0');
       const startMM = String(minutes || 0).padStart(2, '0');
-      const endHH = String(hours + 1).padStart(2, '0');
-      startDateTime = `${scheduledDate}T${startHH}:${startMM}:00`;
-      endDateTime   = `${scheduledDate}T${endHH}:${startMM}:00`;
+      // Convert PDT (UTC-7) to UTC by adding 7 hours
+      const startUTC = hours + 7;
+      const endUTC   = hours + 8;
+      startDateTime = `${scheduledDate}T${String(startUTC).padStart(2,'0')}:${startMM}:00Z`;
+      endDateTime   = `${scheduledDate}T${String(endUTC).padStart(2,'0')}:${startMM}:00Z`;
 
       // ── CHECK DAILY JOB LIMIT (max 3 per day) ───────────────
       const dayStart = `${scheduledDate}T00:00:00`;
@@ -284,8 +285,8 @@ module.exports = async (req, res) => {
           summary: `IMAGESTATE MEDIA APPT – ${street}, ${city}`,
           location: `${street}, ${city}, CA ${zip}`,
           description,
-          start: { dateTime: startDateTime, timeZone: 'America/Los_Angeles' },
-          end:   { dateTime: endDateTime,   timeZone: 'America/Los_Angeles' },
+          start: { dateTime: startDateTime },
+          end:   { dateTime: endDateTime },
           attendees: [{ email, displayName: clientName }],
           reminders: {
             useDefault: false,

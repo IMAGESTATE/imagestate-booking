@@ -256,16 +256,24 @@ module.exports = async (req, res) => {
     try {
       let startDateTime, endDateTime;
 
+      // Duration in hours by package (shoot time only, no buffer for calendar display)
+      const shootDuration = {
+        'photos-only': 1,
+        'video-only': 1.5,
+        'photo-video': 2,
+        'photo-video-floor': 2,
+        'full-estate': 3,
+      }[packageId] || 1;
+
       // Parse selected time e.g. "9:00 AM"
       const [timePart, meridiem] = scheduledTime.split(' ');
       let [hours, minutes] = timePart.split(':').map(Number);
       if (meridiem === 'PM' && hours !== 12) hours += 12;
       if (meridiem === 'AM' && hours === 12) hours = 0;
-      const startMM = String(minutes || 0).padStart(2, '0');
       // Build date object in PDT (UTC-7) and convert to ISO UTC
       const [yr, mo, dy] = scheduledDate.split('-').map(Number);
       const startDate = new Date(Date.UTC(yr, mo - 1, dy, hours + 7, minutes || 0, 0));
-      const endDate   = new Date(Date.UTC(yr, mo - 1, dy, hours + 8, minutes || 0, 0));
+      const endDate   = new Date(startDate.getTime() + shootDuration * 60 * 60 * 1000);
       startDateTime = startDate.toISOString();
       endDateTime   = endDate.toISOString();
 

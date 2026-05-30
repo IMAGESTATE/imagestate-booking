@@ -855,19 +855,37 @@ function selectCalDate(dateStr) {
 }
 
 function renderTimeSlots(dateStr) {
-  const section  = document.getElementById('timeSlotSection');
-  const grid     = document.getElementById('timeSlotGrid');
-  const taken    = availData.slotsByDate[dateStr] || [];
+  const section = document.getElementById('timeSlotSection');
+  const grid    = document.getElementById('timeSlotGrid');
+  const taken   = availData.slotsByDate[dateStr] || [];
+
+  const durationLabels = {
+    'photos-only':'1 hr','video-only':'1.5 hrs',
+    'photo-video':'2 hrs','photo-video-floor':'2 hrs','full-estate':'3 hrs'
+  };
+  const latestStart = {
+    'photos-only':16,'video-only':15,'photo-video':15,'photo-video-floor':15,'full-estate':14
+  };
+  const durationLabel = durationLabels[selectedPackageId] || '1 hr';
+  const maxStartHour  = latestStart[selectedPackageId] || 16;
+
+  const slotHours = {'8:00 AM':8,'9:00 AM':9,'10:00 AM':10,'11:00 AM':11,'12:00 PM':12,'1:00 PM':13,'2:00 PM':14,'3:00 PM':15,'4:00 PM':16};
 
   section.style.display = 'block';
   grid.innerHTML = '';
 
   ALL_SLOTS.forEach(slot => {
+    const slotHour = slotHours[slot];
     const el = document.createElement('div');
     el.className = 'time-slot';
-    el.textContent = slot;
+    el.innerHTML = '<div style="font-weight:500">' + slot + '</div><div style="font-size:11px;opacity:0.7;margin-top:2px;">' + durationLabel + '</div>';
     el.dataset.time = slot;
-    if (taken.includes(slot)) {
+
+    if (slotHour > maxStartHour) {
+      // Too late for this package — show as unavailable
+      el.classList.add('taken');
+      el.title = 'Too late for this package';
+    } else if (taken.includes(slot)) {
       el.classList.add('taken');
     } else {
       el.onclick = () => {
@@ -880,7 +898,6 @@ function renderTimeSlots(dateStr) {
     grid.appendChild(el);
   });
 
-  // Scroll to time slots smoothly
   setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
 }
 

@@ -14,612 +14,135 @@
     --cream: #f4f6f9;
     --white: #ffffff;
     --gray: #8a95a8;
-    --gray-light: #eef1f6;
     --text: #042752;
-    --success: #00a896;
+    --error: #e05252;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* HEADER */
-  .form-header {
-    background: var(--navy);
-    padding: 24px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .logo-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .logo-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--white);
-    letter-spacing: 3px;
-  }
-
-  .progress-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .progress-step {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    transition: all 0.3s ease;
-  }
-
+  .form-header { background: var(--navy); padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(4,39,82,0.3); }
+  .progress-wrap { display: flex; align-items: center; gap: 8px; }
+  .progress-step { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s ease; }
   .progress-step.active { background: var(--gold); transform: scale(1.3); }
-  .progress-step.done { background: rgba(201,168,76,0.5); }
+  .progress-step.done { background: rgba(0,168,150,0.5); }
 
-  /* TOTAL BAR */
-  .total-bar {
-    background: var(--navy-light);
-    padding: 12px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(201,168,76,0.2);
-  }
+  .total-bar { background: var(--navy-light); padding: 10px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,168,150,0.2); }
+  .total-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+  .total-amount { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; color: var(--gold); }
 
-  .total-label {
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--navy); font-weight: 500;
-  }
-
-  .total-amount {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-weight: 300;
-    color: var(--gold);
-  }
-
-  /* PAGES */
-  .page { display: none; animation: fadeUp 0.4s ease; }
+  .page { display: none; animation: fadeUp 0.35s ease; }
   .page.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .page-inner { max-width: 720px; margin: 0 auto; padding: 44px 24px 120px; }
+  .page-num { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 300; color: var(--navy); line-height: 1.1; margin-bottom: 8px; }
+  .page-sub { font-size: 14px; color: var(--gray); line-height: 1.6; margin-bottom: 36px; }
 
-  .page-inner {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 48px 24px 120px;
-  }
-
-  .page-num {
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 8px;
-  }
-
-  .page-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 40px;
-    font-weight: 300;
-    color: var(--navy);
-    line-height: 1.1;
-    margin-bottom: 8px;
-  }
-
-  .page-sub {
-    font-size: 14px;
-    color: var(--navy); font-weight: 500;
-    line-height: 1.6;
-    margin-bottom: 40px;
-  }
-
-  /* FIELDS */
-  .field-group {
-    margin-bottom: 28px;
-  }
-
-  .field-label {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--navy);
-    font-weight: 500;
-    margin-bottom: 8px;
-    display: block;
-  }
-
-  .field-input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid #dde0ea;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: var(--text);
-    background: var(--white);
-    transition: border-color 0.2s;
-    outline: none;
-  }
-
+  .field-group { margin-bottom: 24px; }
+  .field-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--navy); font-weight: 500; margin-bottom: 8px; display: block; }
+  .field-input { width: 100%; padding: 13px 16px; border: 1.5px solid #dde0ea; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); background: var(--white); transition: border-color 0.2s; outline: none; }
   .field-input:focus { border-color: var(--navy); }
+  .field-input.error { border-color: var(--error); }
+  .field-error { font-size: 12px; color: var(--error); margin-top: 5px; display: none; }
+  .field-error.show { display: block; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field-hint { font-size: 12px; color: var(--gray); margin-top: 5px; }
 
-  .date-fully-booked-note {
-    margin-top: 8px;
-    font-size: 12px;
-    color: #e05252;
-    display: none;
-  }
+  .tier-detected { background: var(--navy); border-radius: 10px; padding: 16px 20px; margin-top: 12px; display: none; align-items: center; gap: 12px; }
+  .tier-detected.show { display: flex; }
+  .tier-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .tier-dot.standard { background: #00a896; }
+  .tier-dot.premium { background: #f0a500; }
+  .tier-dot.luxury { background: #c084fc; }
+  .tier-text { font-size: 13px; color: rgba(255,255,255,0.85); }
+  .tier-text strong { color: var(--white); }
 
-  .field-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
+  .section-divider { display: flex; align-items: center; gap: 12px; margin: 28px 0 20px; }
+  .section-divider-line { flex: 1; height: 1px; background: #dde0ea; }
+  .section-divider-text { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
 
-  /* SERVICE CARDS */
-  .service-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  .toggle-row { display: flex; gap: 0; border: 1.5px solid #dde0ea; border-radius: 8px; overflow: hidden; width: fit-content; }
+  .toggle-btn { padding: 10px 24px; background: var(--white); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray); transition: all 0.2s; }
+  .toggle-btn.active { background: var(--navy); color: var(--white); }
 
-  .service-card {
-    background: var(--white);
-    border: 2px solid #dde0ea;
-    border-radius: 12px;
-    padding: 20px 24px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-  }
+  .package-grid { display: flex; flex-direction: column; gap: 14px; }
+  .package-card { background: var(--white); border: 2px solid #dde0ea; border-radius: 14px; padding: 22px 24px; cursor: pointer; transition: all 0.2s ease; position: relative; overflow: hidden; }
+  .package-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: transparent; transition: background 0.2s; }
+  .package-card:hover { border-color: var(--navy); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(4,39,82,0.08); }
+  .package-card.selected { border-color: var(--navy); background: #f0f2f8; }
+  .package-card.selected::before { background: var(--navy); }
+  .package-card.popular { border-color: rgba(0,168,150,0.4); }
+  .package-card.popular:hover { border-color: var(--gold); }
+  .package-card.popular.selected { border-color: var(--gold); background: #f0faf9; }
+  .package-card.popular.selected::before { background: var(--gold); }
+  .package-card.luxury-card { border-color: rgba(192,132,252,0.4); }
+  .package-card.luxury-card.selected { border-color: #c084fc; background: #faf0ff; }
+  .package-card.luxury-card.selected::before { background: #c084fc; }
 
-  .service-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: transparent;
-    transition: background 0.2s;
-  }
+  .package-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .package-left { flex: 1; }
+  .package-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-bottom: 8px; font-weight: 500; }
+  .badge-standard { background: #eef0f5; color: var(--gray); }
+  .badge-popular { background: #e6f7f5; color: #007a6d; }
+  .badge-best { background: #fdf3db; color: #8a6a1a; }
+  .badge-luxury { background: #f3e8ff; color: #7c3aed; }
+  .package-name { font-size: 18px; font-weight: 500; color: var(--navy); margin-bottom: 4px; }
+  .package-includes { font-size: 13px; color: var(--gray); line-height: 1.5; }
+  .package-right { text-align: right; flex-shrink: 0; display: flex; align-items: center; gap: 12px; }
+  .package-price { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 300; color: var(--navy); }
+  .package-card.popular .package-price { color: var(--gold); }
+  .package-card.luxury-card .package-price { color: #c084fc; }
+  .package-original { font-size: 13px; color: var(--gray); text-decoration: line-through; margin-bottom: 2px; }
+  .package-savings { font-size: 12px; color: var(--gold); font-weight: 500; }
+  .package-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .pkg-tag { font-size: 11px; padding: 3px 10px; background: #eef0f5; border-radius: 20px; color: var(--gray); }
+  .package-card.popular .pkg-tag { background: #e6f7f5; color: #007a6d; }
+  .package-card.luxury-card .pkg-tag { background: #f3e8ff; color: #7c3aed; }
+  .package-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #dde0ea; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .package-card.selected .package-check { background: var(--navy); border-color: var(--navy); }
+  .package-card.popular.selected .package-check { background: var(--gold); border-color: var(--gold); }
+  .package-card.luxury-card.selected .package-check { background: #c084fc; border-color: #c084fc; }
+  .package-check svg { opacity: 0; transition: opacity 0.2s; }
+  .package-card.selected .package-check svg { opacity: 1; }
 
-  .service-card:hover { border-color: var(--navy); transform: translateY(-1px); }
-  .service-card.selected { border-color: var(--navy); background: #f0f2f8; }
-  .service-card.selected::before { background: var(--navy); }
-  .service-card.luxury { border-color: rgba(201,168,76,0.4); }
-  .service-card.luxury:hover { border-color: var(--gold); }
-  .service-card.luxury.selected { border-color: var(--gold); background: #fdf9ef; }
-  .service-card.luxury.selected::before { background: var(--gold); }
-
-  .service-card-left { flex: 1; }
-
-  .service-badge {
-    display: inline-block;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin-bottom: 6px;
-    font-weight: 500;
-  }
-
-  .badge-standard { background: #eef0f5; color: var(--navy); font-weight: 500; }
-  .badge-premium { background: #e8eaf6; color: #4a5080; }
-  .badge-luxury { background: #fdf3db; color: #8a6a1a; }
-  .badge-bundle { background: #e8f5e9; color: #2e6b3e; }
-
-  .service-name {
-    font-size: 17px;
-    font-weight: 500;
-    color: var(--navy);
-    margin-bottom: 4px;
-  }
-
-  .service-desc {
-    font-size: 13px;
-    color: var(--navy); font-weight: 500;
-    line-height: 1.5;
-  }
-
-  .service-price {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 26px;
-    font-weight: 300;
-    color: var(--navy);
-    white-space: nowrap;
-    margin-left: 20px;
-  }
-
-  .service-card.luxury .service-price { color: var(--gold); }
-
-  .check-circle {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 2px solid #dde0ea;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 12px;
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-
-  .service-card.selected .check-circle {
-    background: var(--navy);
-    border-color: var(--navy);
-  }
-
-  .service-card.luxury.selected .check-circle {
-    background: var(--gold);
-    border-color: var(--gold);
-  }
-
-  .check-circle svg { opacity: 0; transition: opacity 0.2s; }
-  .service-card.selected .check-circle svg { opacity: 1; }
-
-  /* PRICING OPTIONS */
-  .pricing-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .pricing-option {
-    background: var(--white);
-    border: 2px solid var(--navy);
-    border-radius: 10px;
-    padding: 16px 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .pricing-option:hover { border-color: var(--navy); }
-  .pricing-option.selected { border-color: var(--navy); background: #f0f2f8; }
-  .pricing-option.luxury-option.selected { border-color: var(--gold); background: #fdf9ef; }
-
-  .pricing-left { display: flex; align-items: center; gap: 12px; }
-
-  .radio-dot {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    border: 2px solid #dde0ea;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-
-  .pricing-option.selected .radio-dot { border-color: var(--navy); }
-  .pricing-option.luxury-option.selected .radio-dot { border-color: var(--gold); }
-
-  .radio-inner {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: transparent;
-    transition: all 0.2s;
-  }
-
-  .pricing-option.selected .radio-inner { background: var(--navy); }
-  .pricing-option.luxury-option.selected .radio-inner { background: var(--gold); }
-
-  .pricing-info {}
-  .pricing-tier {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--navy); font-weight: 500;
-    margin-bottom: 2px;
-  }
-
-  .pricing-name { font-size: 15px; font-weight: 500; color: var(--navy); }
-  .pricing-note { font-size: 12px; color: var(--navy); font-weight: 500; margin-top: 2px; }
-
-  .pricing-amount {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 24px;
-    font-weight: 300;
-    color: var(--navy);
-  }
-
-  .luxury-option .pricing-amount { color: var(--gold); }
-
-  .luxury-note {
-    background: #fdf9ef;
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-top: 12px;
-    font-size: 13px;
-    color: #8a6a1a;
-    line-height: 1.6;
-  }
-
-  /* ADDON GRID */
-  .addon-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .addon-card {
-    background: var(--white);
-    border: 2px solid var(--navy);
-    border-radius: 10px;
-    padding: 14px 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
+  .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .addon-card { background: var(--white); border: 1.5px solid #dde0ea; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: flex-start; gap: 10px; }
   .addon-card:hover { border-color: var(--navy); }
   .addon-card.selected { border-color: var(--navy); background: #f0f2f8; }
-
-  .addon-check {
-    width: 18px; height: 18px;
-    border-radius: 4px;
-    border: 2px solid #dde0ea;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    margin-top: 2px;
-    transition: all 0.2s;
-  }
-
+  .addon-check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #dde0ea; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; transition: all 0.2s; }
   .addon-card.selected .addon-check { background: var(--navy); border-color: var(--navy); }
-
   .addon-info { flex: 1; }
   .addon-name { font-size: 14px; font-weight: 500; color: var(--navy); margin-bottom: 2px; }
-  .addon-desc { font-size: 11px; color: var(--navy); font-weight: 500; line-height: 1.4; }
-  .addon-price { font-size: 14px; font-weight: 500; color: var(--navy); margin-top: 6px; }
+  .addon-desc { font-size: 11px; color: var(--gray); line-height: 1.4; }
+  .addon-price { font-size: 14px; font-weight: 500; color: var(--navy); margin-top: 5px; }
 
-  /* SECTION DIVIDER */
-  .section-divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 32px 0 20px;
-  }
-
-  .section-divider-line { flex: 1; height: 1px; background: #dde0ea; }
-  .section-divider-text {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--navy); font-weight: 500;
-    white-space: nowrap;
-  }
-
-  /* SCHEDULE */
-  .schedule-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 24px;
-  }
-
-  .time-slot {
-    padding: 12px 8px;
-    text-align: center;
-    border: 2px solid var(--navy);
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--navy);
-    transition: all 0.2s;
-    background: var(--white);
-  }
-
+  .schedule-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; }
+  .time-slot { padding: 12px 8px; text-align: center; border: 1.5px solid #dde0ea; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--navy); transition: all 0.2s; background: var(--white); }
   .time-slot:hover { border-color: var(--navy); }
   .time-slot.selected { border-color: var(--navy); background: var(--navy); color: var(--white); }
 
-  /* TOGGLE */
-  .toggle-row {
-    display: flex;
-    gap: 0;
-    border: 2px solid var(--navy);
-    border-radius: 8px;
-    overflow: hidden;
-    width: fit-content;
-  }
-
-  .toggle-btn {
-    padding: 10px 24px;
-    background: var(--white);
-    border: none;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--navy); font-weight: 500;
-    transition: all 0.2s;
-  }
-
-  .toggle-btn.active { background: var(--navy); color: var(--white); }
-
-  /* NAV BUTTONS */
-  .form-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--white);
-    border-top: 1px solid #dde0ea;
-    padding: 16px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 100;
-  }
-
-  .btn-back {
-    padding: 12px 28px;
-    background: transparent;
-    border: 2px solid var(--navy);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--navy); font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn-back:hover { border-color: var(--navy); color: var(--navy); }
-
-  .btn-next {
-    padding: 14px 40px;
-    background: var(--navy);
-    border: none;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--white);
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.5px;
-  }
-
-  .btn-next:hover { background: var(--navy-light); transform: translateY(-1px); }
-
-  .btn-submit {
-    padding: 14px 40px;
-    background: var(--gold);
-    border: none;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--white);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
-
-  /* INCLUDES LIST */
-  .includes-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 6px;
-  }
-
-  .include-tag {
-    font-size: 11px;
-    padding: 4px 10px;
-    background: #eef0f5;
-    border-radius: 20px;
-    color: var(--navy); font-weight: 500;
-  }
-
-  /* REVIEW PAGE */
-  .review-section {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 16px;
-  }
-
-  .review-section-title {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 16px;
-    font-weight: 500;
-  }
-
-  .review-line {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 8px 0;
-    border-bottom: 1px solid #eef0f5;
-    font-size: 14px;
-  }
-
+  .review-section { background: var(--white); border-radius: 12px; padding: 22px; margin-bottom: 14px; }
+  .review-section-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; font-weight: 500; }
+  .review-line { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #eef0f5; font-size: 14px; }
   .review-line:last-child { border-bottom: none; }
-  .review-line-label { color: var(--navy); font-weight: 500; }
-  .review-line-value { font-weight: 500; text-align: right; }
+  .review-line-label { color: var(--gray); }
+  .review-line-value { font-weight: 500; text-align: right; max-width: 60%; }
+  .review-total { background: var(--navy); border-radius: 12px; padding: 22px; display: flex; justify-content: space-between; align-items: center; }
+  .review-total-label { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .review-total-amount { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; color: var(--gold); }
 
-  .review-total {
-    background: var(--navy);
-    border-radius: 12px;
-    padding: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  .success-page { text-align: center; padding: 80px 24px; }
+  .success-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
 
-  .review-total-label {
-    font-size: 13px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.6);
-  }
-
-  .review-total-amount {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 42px;
-    font-weight: 300;
-    color: var(--gold);
-  }
-
-  .success-page {
-    text-align: center;
-    padding: 80px 24px;
-  }
-
-  .success-icon {
-    width: 72px; height: 72px;
-    border-radius: 50%;
-    background: var(--success);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 24px;
-  }
-
-  .aerial-note {
-    background: var(--navy);
-    color: rgba(255,255,255,0.8);
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 12px;
-    line-height: 1.6;
-    margin-bottom: 24px;
-  }
-
-  .aerial-note span { color: var(--gold); font-weight: 500; }
+  .form-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid #dde0ea; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+  .btn-back { padding: 12px 28px; background: transparent; border: 2px solid var(--navy); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--navy); cursor: pointer; transition: all 0.2s; }
+  .btn-back:hover { background: var(--navy); color: var(--white); }
+  .btn-next { padding: 13px 40px; background: var(--navy); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; color: var(--white); cursor: pointer; transition: all 0.2s; }
+  .btn-next:hover { background: var(--navy-light); transform: translateY(-1px); }
+  .btn-submit { padding: 13px 40px; background: var(--gold); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; color: var(--white); cursor: pointer; transition: all 0.2s; }
+  .btn-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .date-booked-note { margin-top: 8px; font-size: 12px; color: var(--error); display: none; }
 
   @media (max-width: 500px) {
     .addon-grid { grid-template-columns: 1fr; }
@@ -627,29 +150,26 @@
     .schedule-grid { grid-template-columns: repeat(2, 1fr); }
     .form-header { padding: 16px; }
     .total-bar { padding: 10px 16px; }
+    .package-top { flex-wrap: wrap; }
   }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="form-header">
-  <div class="logo">
-    <img src="https://cdn.durable.co/blocks/9V6s7Y5zhAZ9XIsFWyvmg1Z4FkbzHEsfxH0pZFebAq9V40gdF8gxV7QXHCiv4d4j.png" alt="IMAGESTATE" style="height:36px;width:auto;">
-  </div>
+  <img src="https://cdn.durable.co/blocks/9V6s7Y5zhAZ9XIsFWyvmg1Z4FkbzHEsfxH0pZFebAq9V40gdF8gxV7QXHCiv4d4j.png" alt="IMAGESTATE" style="height:34px;width:auto;">
   <div class="progress-wrap" id="progressDots"></div>
 </div>
 
-<!-- TOTAL BAR -->
 <div class="total-bar">
   <span class="total-label">Estimated Total</span>
   <span class="total-amount" id="totalAmount">$0.00</span>
 </div>
 
-<!-- ==================== PAGE 1: CONTACT ==================== -->
+<!-- PAGE 1: CONTACT + PROPERTY -->
 <div class="page active" id="page1">
   <div class="page-inner">
-    <div class="page-num">Step 1 of 10</div>
+    <div class="page-num">Step 1 of 5</div>
     <h1 class="page-title">Let's get started.</h1>
     <p class="page-sub">Tell us about you and your listing. All fields marked * are required.</p>
 
@@ -657,21 +177,23 @@
       <div class="field-group">
         <label class="field-label">First Name *</label>
         <input class="field-input" id="firstName" type="text" placeholder="Jane">
+        <div class="field-error" id="err-firstName">Please enter your first name</div>
       </div>
       <div class="field-group">
         <label class="field-label">Last Name *</label>
         <input class="field-input" id="lastName" type="text" placeholder="Smith">
+        <div class="field-error" id="err-lastName">Please enter your last name</div>
       </div>
     </div>
-
     <div class="field-group">
       <label class="field-label">Email Address *</label>
       <input class="field-input" id="email" type="email" placeholder="jane@realty.com">
+      <div class="field-error" id="err-email">Please enter a valid email address</div>
     </div>
-
     <div class="field-group">
       <label class="field-label">Phone Number *</label>
       <input class="field-input" id="phone" type="tel" placeholder="(760) 555-0100">
+      <div class="field-error" id="err-phone">Please enter your phone number</div>
     </div>
 
     <div class="section-divider">
@@ -683,24 +205,30 @@
     <div class="field-group">
       <label class="field-label">Listing Street Address *</label>
       <input class="field-input" id="street" type="text" placeholder="123 Desert Rose Drive">
+      <div class="field-error" id="err-street">Please enter the property address</div>
     </div>
-
     <div class="field-row">
       <div class="field-group">
         <label class="field-label">City *</label>
         <input class="field-input" id="city" type="text" placeholder="Palm Springs">
+        <div class="field-error" id="err-city">Please enter the city</div>
       </div>
       <div class="field-group">
         <label class="field-label">Zip Code *</label>
         <input class="field-input" id="zip" type="text" placeholder="92262">
+        <div class="field-error" id="err-zip">Please enter the zip code</div>
       </div>
     </div>
-
     <div class="field-group">
       <label class="field-label">Approximate Square Footage *</label>
-      <input class="field-input" id="sqft" type="text" placeholder="e.g. 3,200">
+      <input class="field-input" id="sqft" type="number" placeholder="e.g. 2100" oninput="detectTier()">
+      <div class="field-error" id="err-sqft">Please enter the square footage</div>
+      <div class="field-hint">Used to determine accurate pricing for your property.</div>
+      <div class="tier-detected" id="tierBadge">
+        <div class="tier-dot" id="tierDot"></div>
+        <div class="tier-text" id="tierText"></div>
+      </div>
     </div>
-
     <div class="field-group">
       <label class="field-label">Will you be attending the appointment? *</label>
       <div class="toggle-row">
@@ -725,7 +253,6 @@
         <input class="field-input" id="gateCode" type="text" placeholder="e.g. 11167">
       </div>
     </div>
-
     <div class="field-row">
       <div class="field-group">
         <label class="field-label">Combo / Lockbox Code</label>
@@ -736,616 +263,42 @@
         <input class="field-input" id="accessNotes" type="text" placeholder="Key location, notes...">
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ==================== PAGE 2: SERVICE ==================== -->
+<!-- PAGE 2: PACKAGES -->
 <div class="page" id="page2">
   <div class="page-inner">
-    <div class="page-num">Step 2 of 10</div>
-    <h1 class="page-title">Select your service.</h1>
-    <p class="page-sub">Choose the primary service for your listing. Aerial photography is included with all packages, subject to FAA airspace availability.</p>
-
-    <div class="aerial-note">
-      <span>✦ Drone & Aerial Included</span> — All packages include aerial photography at no extra cost, subject to FAA airspace restrictions at your location.
-    </div>
-
-    <div class="service-grid">
-      <div class="service-card" onclick="selectService(this, 'photo', 0)" data-service="photo">
-        <div class="service-card-left">
-          <div class="service-badge badge-standard">Photography</div>
-          <div class="service-name">Photography Only</div>
-          <div class="service-desc">HDR interior & exterior photos + aerial. 24-hour delivery.</div>
-          <div class="includes-list">
-            <span class="include-tag">HDR Photos</span>
-            <span class="include-tag">Aerial</span>
-            <span class="include-tag">24hr Delivery</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;">
-          <span class="service-price">From $249</span>
-          <div class="check-circle">
-            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <div class="service-card" onclick="selectService(this, 'video', 0)" data-service="video">
-        <div class="service-card-left">
-          <div class="service-badge badge-standard">Videography</div>
-          <div class="service-name">Videography Only</div>
-          <div class="service-desc">Cinematic listing video + aerial footage. 48-hour delivery.</div>
-          <div class="includes-list">
-            <span class="include-tag">Cinematic Edit</span>
-            <span class="include-tag">Aerial</span>
-            <span class="include-tag">Licensed Music</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;">
-          <span class="service-price">From $549</span>
-          <div class="check-circle">
-            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <div class="service-card" onclick="selectService(this, 'bundle', 0)" data-service="bundle">
-        <div class="service-card-left">
-          <div class="service-badge badge-bundle">Best Value</div>
-          <div class="service-name">Photography + Video Bundle</div>
-          <div class="service-desc">Both services, one shoot, one delivery. Maximum listing impact.</div>
-          <div class="includes-list">
-            <span class="include-tag">HDR Photos</span>
-            <span class="include-tag">Cinematic Video</span>
-            <span class="include-tag">Aerial</span>
-            <span class="include-tag">Priority Delivery</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;">
-          <span class="service-price">From $798</span>
-          <div class="check-circle">
-            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <div class="service-card" onclick="selectService(this, 'tour', 125)" data-service="tour">
-        <div class="service-card-left">
-          <div class="service-badge badge-premium">Virtual Tour</div>
-          <div class="service-name">360 Virtual Tour Only</div>
-          <div class="service-desc">Immersive virtual walkthrough. Can also be added to any package above.</div>
-        </div>
-        <div style="display:flex;align-items:center;">
-          <span class="service-price">From $125</span>
-          <div class="check-circle">
-            <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="page-num">Step 2 of 5</div>
+    <h1 class="page-title">Choose your package.</h1>
+    <p class="page-sub" id="packageSubtext">Pricing tailored to your property. All packages include aerial drone photography, subject to FAA airspace availability.</p>
+    <div class="package-grid" id="packageGrid"></div>
   </div>
 </div>
 
-<!-- ==================== PAGE 3: PHOTO PRICING ==================== -->
+<!-- PAGE 3: ADD-ONS -->
 <div class="page" id="page3">
   <div class="page-inner">
-    <div class="page-num">Step 3 of 10</div>
-    <h1 class="page-title">Photography pricing.</h1>
-    <p class="page-sub">Select your property's size. All packages include HDR photography, aerial shots, and 24-hour delivery.</p>
-
-    <div class="pricing-grid">
-      <div class="pricing-option" onclick="selectPricing(this, 'photo', 249)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">Standard</div>
-            <div class="pricing-name">Under 1,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$249</div>
-      </div>
-
-      <div class="pricing-option" onclick="selectPricing(this, 'photo', 299)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">Standard</div>
-            <div class="pricing-name">1,501 – 2,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$299</div>
-      </div>
-
-      <div class="pricing-option" onclick="selectPricing(this, 'photo', 369)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">Standard</div>
-            <div class="pricing-name">2,501 – 3,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$369</div>
-      </div>
-
-      <div class="pricing-option" onclick="selectPricing(this, 'photo', 499)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">Premium</div>
-            <div class="pricing-name">3,501 – 4,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$499</div>
-      </div>
-
-      <div class="pricing-option" onclick="selectPricing(this, 'photo', 599)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">Premium</div>
-            <div class="pricing-name">4,501 – 5,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$599</div>
-      </div>
-
-      <div class="pricing-option" onclick="selectPricing(this, 'photo', 699)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">Premium</div>
-            <div class="pricing-name">5,501 – 6,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$699</div>
-      </div>
-
-      <div class="pricing-option luxury-option" onclick="selectPricing(this, 'photo', 999)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">✦ Luxury Estate</div>
-            <div class="pricing-name">6,501 – 8,000 SqFt</div>
-            <div class="pricing-note">Full RAW workflow · Advanced window pulls · Up to 60 images</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$999</div>
-      </div>
-
-      <div class="pricing-option luxury-option" onclick="selectPricing(this, 'photo', 1299)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">✦ Luxury Estate</div>
-            <div class="pricing-name">8,001 – 9,500 SqFt</div>
-            <div class="pricing-note">Full RAW workflow · Advanced window pulls · Up to 60 images</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$1,299</div>
-      </div>
-
-      <div class="pricing-option luxury-option" onclick="selectPricing(this, 'photo', 1599)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-tier">✦ Luxury Estate</div>
-            <div class="pricing-name">9,500+ SqFt</div>
-            <div class="pricing-note">Full RAW workflow · Advanced window pulls · Up to 60 images</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$1,599</div>
-      </div>
-    </div>
-
-    <div class="luxury-note">
-      ✦ <strong>Luxury Estate</strong> shoots include our full manual editing workflow with RAW file processing, advanced luminosity window pulls, and premium color grading — the highest quality output we offer.
-    </div>
+    <div class="page-num">Step 3 of 5</div>
+    <h1 class="page-title">Enhance your order.</h1>
+    <p class="page-sub">Optional add-ons to complement your package. All delivered with your final media.</p>
+    <div class="addon-grid" id="addonGrid"></div>
   </div>
 </div>
 
-<!-- ==================== PAGE 4: VIDEO PRICING ==================== -->
+<!-- PAGE 4: SCHEDULE -->
 <div class="page" id="page4">
   <div class="page-inner">
-    <div class="page-num">Step 4 of 10</div>
-    <h1 class="page-title">Videography pricing.</h1>
-    <p class="page-sub">All videos include aerial footage, licensed music, and cinematic editing. Delivered within 48 hours.</p>
-
-    <div class="section-divider">
-      <div class="section-divider-line"></div>
-      <span class="section-divider-text">Daytime Cinematic Video</span>
-      <div class="section-divider-line"></div>
-    </div>
-
-    <div class="pricing-grid" style="margin-bottom:8px;">
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 549)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-name">Under 2,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$549</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 699)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">2,501 – 4,500 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$699</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 899)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">4,501 – 6,000 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$899</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 1199)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">6,000+ SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$1,199</div>
-      </div>
-    </div>
-
-    <div class="section-divider">
-      <div class="section-divider-line"></div>
-      <span class="section-divider-text">Day-to-Dusk Cinematic Video</span>
-      <div class="section-divider-line"></div>
-    </div>
-
-    <div class="pricing-grid" style="margin-bottom:8px;">
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 749)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
-            <div class="pricing-name">Under 2,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$749</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 899)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
-            <div class="pricing-name">2,501 – 4,500 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$899</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 1099)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
-            <div class="pricing-name">4,501 – 6,000 SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$1,099</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 1399)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-note" style="margin-bottom:2px;">Golden hour into dusk</div>
-            <div class="pricing-name">6,000+ SqFt</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$1,399</div>
-      </div>
-    </div>
-
-    <div class="section-divider">
-      <div class="section-divider-line"></div>
-      <span class="section-divider-text">Simple Walkthrough</span>
-      <div class="section-divider-line"></div>
-    </div>
-
-    <div class="pricing-grid">
-      <div class="pricing-option" onclick="selectPricing(this, 'video', 149)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-name">Simple Walkthrough Video</div>
-            <div class="pricing-note">No cuts, no music — continuous walkthrough</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$149</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== PAGE 5: PHOTO ADD-ONS ==================== -->
-<div class="page" id="page5">
-  <div class="page-inner">
-    <div class="page-num">Step 5 of 10</div>
-    <h1 class="page-title">Enhance your photos.</h1>
-    <p class="page-sub">Add any of the following to your photography package. All add-ons are delivered with your final images.</p>
-
-    <div class="addon-grid">
-      <div class="addon-card" onclick="toggleAddon(this, 399)" data-name="Twilight Session">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Twilight Session</div>
-          <div class="addon-desc">Real golden hour + dusk exterior shoot. Time coordinated directly with you.</div>
-          <div class="addon-price">$399</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 79)" data-name="Virtual Twilight x1">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Virtual Twilight ×1</div>
-          <div class="addon-desc">AI-generated dusk from daytime photo</div>
-          <div class="addon-price">$79</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 139)" data-name="Virtual Twilight x2">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Virtual Twilight ×2</div>
-          <div class="addon-desc">Two AI-generated dusk images</div>
-          <div class="addon-price">$139</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Feature Detail Shots">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Feature Detail Shots</div>
-          <div class="addon-desc">Close-up lifestyle details, ideal for luxury & vacation rentals</div>
-          <div class="addon-price">$149</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 99)" data-name="Community Area Shots">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Community Area Shots</div>
-          <div class="addon-desc">Pool, clubhouse, amenity areas</div>
-          <div class="addon-price">$99</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 69)" data-name="Grass Addition">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Grass Addition</div>
-          <div class="addon-desc">Virtual grass for dead or patchy lawns</div>
-          <div class="addon-price">$69</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Rush Processing">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Rush Processing</div>
-          <div class="addon-desc">Next morning delivery by 9am</div>
-          <div class="addon-price">$149</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Slideshow Video">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Slideshow Video</div>
-          <div class="addon-desc">Branded photo slideshow for social media</div>
-          <div class="addon-price">$149</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== PAGE 6: VIRTUAL STAGING ==================== -->
-<div class="page" id="page6">
-  <div class="page-inner">
-    <div class="page-num">Step 6 of 10</div>
-    <h1 class="page-title">Virtual staging.</h1>
-    <p class="page-sub">Virtually furnish empty rooms to help buyers visualize the space. Delivered within 48 hours.</p>
-
-    <div class="pricing-grid">
-      <div class="pricing-option" onclick="selectPricing(this, 'staging', 0)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">No virtual staging</div></div>
-        </div>
-        <div class="pricing-amount">$0</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'staging', 79)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">1 Photo</div></div>
-        </div>
-        <div class="pricing-amount">$79</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'staging', 189)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info">
-            <div class="pricing-name">3 Photos</div>
-            <div class="pricing-note">Most popular for vacant listings</div>
-          </div>
-        </div>
-        <div class="pricing-amount">$189</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'staging', 249)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">5 Photos</div></div>
-        </div>
-        <div class="pricing-amount">$249</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== PAGE 7: VIDEO ADD-ONS ==================== -->
-<div class="page" id="page7">
-  <div class="page-inner">
-    <div class="page-num">Step 7 of 10</div>
-    <h1 class="page-title">Video add-ons.</h1>
-    <p class="page-sub">Personalize and extend your video package.</p>
-
-    <div class="addon-grid">
-      <div class="addon-card" onclick="toggleAddon(this, 99)" data-name="Branded Video">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Branded Video</div>
-          <div class="addon-desc">Add your logo, contact info, and title cards</div>
-          <div class="addon-price">$99</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 199)" data-name="Agent On Camera">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Agent On Camera</div>
-          <div class="addon-desc">Professional on-camera presence for personalized tours</div>
-          <div class="addon-price">$199</div>
-        </div>
-      </div>
-
-      <div class="addon-card" onclick="toggleAddon(this, 149)" data-name="Extra Video Minutes">
-        <div class="addon-check">
-          <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="addon-info">
-          <div class="addon-name">Extra Video Minutes</div>
-          <div class="addon-desc">Extend final edit beyond standard length</div>
-          <div class="addon-price">$149</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== PAGE 8: FLOOR PLANS ==================== -->
-<div class="page" id="page8">
-  <div class="page-inner">
-    <div class="page-num">Step 8 of 10</div>
-    <h1 class="page-title">Floor plans.</h1>
-    <p class="page-sub">2D floor plans help buyers understand layout and are ideal for MLS listings.</p>
-
-    <div class="pricing-grid">
-      <div class="pricing-option" onclick="selectPricing(this, 'floor', 0)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">No floor plan</div></div>
-        </div>
-        <div class="pricing-amount">$0</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'floor', 99)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">Under 1,500 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$99</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'floor', 150)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">1,500 – 2,500 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$150</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'floor', 210)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">2,500 – 3,500 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$210</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'floor', 275)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">3,500 – 4,500 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$275</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== PAGE 9: 360 TOUR ==================== -->
-<div class="page" id="page9">
-  <div class="page-inner">
-    <div class="page-num">Step 9 of 10</div>
-    <h1 class="page-title">360 Virtual Tour.</h1>
-    <p class="page-sub">Add an immersive virtual walkthrough to your package. Optional — skip if not needed.</p>
-
-    <div class="pricing-grid">
-      <div class="pricing-option" onclick="selectPricing(this, 'tour', 0)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">No virtual tour</div></div>
-        </div>
-        <div class="pricing-amount">$0</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'tour', 125)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">Up to 2,500 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$125</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'tour', 165)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">2,501 – 3,500 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$165</div>
-      </div>
-      <div class="pricing-option" onclick="selectPricing(this, 'tour', 225)">
-        <div class="pricing-left">
-          <div class="radio-dot"><div class="radio-inner"></div></div>
-          <div class="pricing-info"><div class="pricing-name">3,501 – 5,000 SqFt</div></div>
-        </div>
-        <div class="pricing-amount">$225</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== PAGE 10: SCHEDULE ==================== -->
-<div class="page" id="page10">
-  <div class="page-inner">
-    <div class="page-num">Step 10 of 10</div>
+    <div class="page-num">Step 4 of 5</div>
     <h1 class="page-title">Schedule your shoot.</h1>
     <p class="page-sub">Select your preferred date and time. We'll confirm within 2 hours of submission.</p>
 
     <div class="field-group">
       <label class="field-label">Preferred Date *</label>
       <input class="field-input" id="scheduledDate" type="date" onchange="checkDateAvailability(this.value)">
-      <div class="date-fully-booked-note" id="dateBookedNote">⚠️ This date is fully booked. Please select another date.</div>
+      <div class="date-booked-note" id="dateBookedNote">This date is fully booked. Please select another date.</div>
+      <div class="field-error" id="err-date">Please select a date</div>
     </div>
-
     <div class="field-group">
       <label class="field-label">Preferred Time *</label>
       <div class="schedule-grid">
@@ -1359,54 +312,53 @@
         <div class="time-slot" onclick="selectTime(this)" data-time="3:00 PM">3:00 PM</div>
         <div class="time-slot" onclick="selectTime(this)" data-time="4:00 PM">4:00 PM</div>
       </div>
+      <div class="field-error" id="err-time">Please select a time</div>
     </div>
-
     <div class="field-group">
       <label class="field-label">Special Accommodations</label>
-      <textarea class="field-input" id="specialNotes" rows="4" placeholder="Any special instructions, preparation notes, or requests for your shoot..."></textarea>
+      <textarea class="field-input" id="specialNotes" rows="4" placeholder="Any special instructions, preparation notes, or requests..."></textarea>
     </div>
   </div>
 </div>
 
-<!-- ==================== PAGE 11: REVIEW ==================== -->
-<div class="page" id="page11">
+<!-- PAGE 5: REVIEW -->
+<div class="page" id="page5">
   <div class="page-inner">
     <div class="page-num">Review & Confirm</div>
     <h1 class="page-title">Almost done.</h1>
-    <p class="page-sub">Review your order before submitting. We'll reach out within 2 hours to confirm your booking.</p>
+    <p class="page-sub">Review your order before submitting. We'll reach out within 2 hours to confirm.</p>
 
-    <div class="review-section" id="reviewContact">
+    <div class="review-section">
       <div class="review-section-title">Contact & Property</div>
-      <div class="review-line"><span class="review-line-label">Name</span><span class="review-line-value" id="reviewName">—</span></div>
-      <div class="review-line"><span class="review-line-label">Email</span><span class="review-line-value" id="reviewEmail">—</span></div>
-      <div class="review-line"><span class="review-line-label">Phone</span><span class="review-line-value" id="reviewPhone">—</span></div>
-      <div class="review-line"><span class="review-line-label">Address</span><span class="review-line-value" id="reviewAddress">—</span></div>
+      <div class="review-line"><span class="review-line-label">Name</span><span class="review-line-value" id="rName">—</span></div>
+      <div class="review-line"><span class="review-line-label">Email</span><span class="review-line-value" id="rEmail">—</span></div>
+      <div class="review-line"><span class="review-line-label">Phone</span><span class="review-line-value" id="rPhone">—</span></div>
+      <div class="review-line"><span class="review-line-label">Address</span><span class="review-line-value" id="rAddress">—</span></div>
+      <div class="review-line"><span class="review-line-label">Square Footage</span><span class="review-line-value" id="rSqft">—</span></div>
     </div>
-
-    <div class="review-section" id="reviewServices">
-      <div class="review-section-title">Selected Services</div>
-      <div id="reviewServicesList">
-        <div class="review-line"><span class="review-line-label">Service</span><span class="review-line-value" id="reviewServiceName">—</span></div>
-        <div class="review-line"><span class="review-line-label">Photography</span><span class="review-line-value" id="reviewPhotoPrice">—</span></div>
-        <div class="review-line"><span class="review-line-label">Video</span><span class="review-line-value" id="reviewVideoPrice">—</span></div>
-        <div class="review-line"><span class="review-line-label">Virtual Staging</span><span class="review-line-value" id="reviewStagingPrice">—</span></div>
-        <div class="review-line"><span class="review-line-label">Floor Plan</span><span class="review-line-value" id="reviewFloorPrice">—</span></div>
-        <div class="review-line"><span class="review-line-label">Virtual Tour</span><span class="review-line-value" id="reviewTourPrice">—</span></div>
-        <div class="review-line" id="reviewAddonsLine"><span class="review-line-label">Add-Ons</span><span class="review-line-value" id="reviewAddons">—</span></div>
-      </div>
+    <div class="review-section">
+      <div class="review-section-title">Package & Services</div>
+      <div class="review-line"><span class="review-line-label">Package</span><span class="review-line-value" id="rPackage">—</span></div>
+      <div class="review-line"><span class="review-line-label">Package Price</span><span class="review-line-value" id="rPackagePrice">—</span></div>
+      <div class="review-line"><span class="review-line-label">Add-Ons</span><span class="review-line-value" id="rAddons">None</span></div>
     </div>
-
+    <div class="review-section">
+      <div class="review-section-title">Appointment</div>
+      <div class="review-line"><span class="review-line-label">Date</span><span class="review-line-value" id="rDate">—</span></div>
+      <div class="review-line"><span class="review-line-label">Time</span><span class="review-line-value" id="rTime">—</span></div>
+      <div class="review-line"><span class="review-line-label">Notes</span><span class="review-line-value" id="rNotes">None</span></div>
+    </div>
     <div class="review-total">
       <div>
         <div class="review-total-label">Total Estimate</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Final invoice sent on confirmation</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Final invoice sent with your media</div>
       </div>
-      <div class="review-total-amount" id="reviewTotal">$0</div>
+      <div class="review-total-amount" id="rTotal">$0</div>
     </div>
   </div>
 </div>
 
-<!-- ==================== SUCCESS ==================== -->
+<!-- SUCCESS -->
 <div class="page" id="pageSuccess">
   <div class="page-inner">
     <div class="success-page">
@@ -1414,288 +366,342 @@
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M6 16L13 23L26 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <h1 class="page-title" style="margin-bottom:16px;">Booking received.</h1>
-      <p class="page-sub" style="max-width:400px;margin:0 auto;">Thank you for choosing IMAGESTATE. We'll confirm your appointment within 2 hours. Check your email for a copy of this booking.</p>
+      <p class="page-sub" style="max-width:420px;margin:0 auto;">Thank you for choosing IMAGESTATE. We'll confirm your appointment within 2 hours. Check your email for a copy of this booking.</p>
     </div>
   </div>
 </div>
 
-<!-- NAV -->
 <div class="form-nav" id="formNav">
   <button class="btn-back" id="btnBack" onclick="prevPage()">← Back</button>
   <button class="btn-next" id="btnNext" onclick="nextPage()">Continue →</button>
 </div>
 
 <script>
-  const TOTAL_PAGES = 11;
-  let currentPage = 1;
-  let selectedService = null;
+// ── PRICING ENGINE ────────────────────────────────────────────
+function getPricing(sqft) {
+  const s = parseInt(sqft) || 0;
+  let tier, photoPrice, videoPrice, floorPrice, twilightPrice;
 
-  const prices = {
-    service: 0,
-    photo: 0,
-    video: 0,
-    staging: 0,
-    floor: 0,
-    tour: 0,
-    addons: 0
-  };
+  if (s < 1500)       { tier='standard'; photoPrice=249; videoPrice=549; floorPrice=99;  twilightPrice=399; }
+  else if (s < 2500)  { tier='standard'; photoPrice=299; videoPrice=549; floorPrice=150; twilightPrice=399; }
+  else if (s < 3500)  { tier='premium';  photoPrice=369; videoPrice=699; floorPrice=150; twilightPrice=399; }
+  else if (s < 5000)  { tier='premium';  photoPrice=499; videoPrice=699; floorPrice=210; twilightPrice=399; }
+  else if (s < 6500)  { tier='luxury';   photoPrice=699; videoPrice=899; floorPrice=210; twilightPrice=499; }
+  else if (s < 8000)  { tier='luxury';   photoPrice=999; videoPrice=1199; floorPrice=275; twilightPrice=499; }
+  else                { tier='luxury';   photoPrice=1299; videoPrice=1199; floorPrice=275; twilightPrice=499; }
 
-  const addonNames = [];
+  const tourPrice = s < 2500 ? 125 : s < 3500 ? 165 : 225;
 
-  function buildProgress() {
-    const wrap = document.getElementById('progressDots');
-    wrap.innerHTML = '';
-    for (let i = 1; i <= TOTAL_PAGES; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'progress-step' + (i === currentPage ? ' active' : i < currentPage ? ' done' : '');
-      wrap.appendChild(dot);
-    }
+  const photoVideo      = Math.round((photoPrice + videoPrice) * 0.90);
+  const photoVideoFloor = Math.round((photoPrice + videoPrice + floorPrice) * 0.85);
+  const fullEstate      = Math.round((photoPrice + videoPrice + floorPrice + twilightPrice) * 0.80);
+
+  return { tier, photoPrice, videoPrice, floorPrice, twilightPrice, tourPrice, photoVideo, photoVideoFloor, fullEstate };
+}
+
+// ── STATE ─────────────────────────────────────────────────────
+let currentPage = 1;
+const TOTAL_PAGES = 5;
+let selectedPackageId = null;
+let selectedPackagePrice = 0;
+let selectedPackageName = '';
+let addonTotal = 0;
+const addonNames = [];
+let fullyBookedDates = [];
+
+// ── TIER DETECTION ────────────────────────────────────────────
+function detectTier() {
+  const sqft = document.getElementById('sqft').value;
+  const badge = document.getElementById('tierBadge');
+  const dot   = document.getElementById('tierDot');
+  const text  = document.getElementById('tierText');
+  if (!sqft || sqft < 1) { badge.classList.remove('show'); return; }
+  const p = getPricing(sqft);
+  badge.classList.add('show');
+  dot.className = 'tier-dot ' + p.tier;
+  const labels = { standard:'Standard', premium:'Premium', luxury:'Luxury Estate' };
+  const descs  = { standard:'under 2,500 sqft — Standard pricing applies.', premium:'2,500–5,000 sqft — Premium pricing applies.', luxury:'5,000+ sqft — Luxury Estate pricing applies.' };
+  text.innerHTML = '<strong>' + labels[p.tier] + '</strong> — ' + descs[p.tier];
+}
+
+// ── BUILD PACKAGES ────────────────────────────────────────────
+function buildPackages() {
+  const sqft = document.getElementById('sqft').value;
+  const p = getPricing(sqft);
+  const grid = document.getElementById('packageGrid');
+
+  const origPhotoVideo      = p.photoPrice + p.videoPrice;
+  const origPhotoVideoFloor = p.photoPrice + p.videoPrice + p.floorPrice;
+  const origFull            = p.photoPrice + p.videoPrice + p.floorPrice + p.twilightPrice;
+
+  function checkSVG() {
+    return '<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>';
   }
 
-  function updateTotal() {
-    const total = Object.values(prices).reduce((a, b) => a + b, 0);
-    document.getElementById('totalAmount').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 2});
-    document.getElementById('reviewTotal').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 0});
+  function pkgCard(cls, id, price, name, badgeCls, badgeLabel, desc, tags, origPrice, savings) {
+    const savingsHtml = savings ? '<div class="package-original">$' + origPrice + '</div><div class="package-price">$' + price + '</div><div class="package-savings">Save $' + savings + '</div>' : '<div class="package-price">$' + price + '</div>';
+    return '<div class="package-card ' + cls + '" onclick="selectPackage(this,\'' + id + '\',' + price + ',\'' + name + '\')">' +
+      '<div class="package-top">' +
+        '<div class="package-left">' +
+          '<div class="package-badge ' + badgeCls + '">' + badgeLabel + '</div>' +
+          '<div class="package-name">' + name + '</div>' +
+          '<div class="package-includes">' + desc + '</div>' +
+          '<div class="package-tags">' + tags.map(t => '<span class="pkg-tag">' + t + '</span>').join('') + '</div>' +
+        '</div>' +
+        '<div class="package-right"><div>' + savingsHtml + '</div>' +
+        '<div class="package-check">' + checkSVG() + '</div></div>' +
+      '</div></div>';
   }
 
-  function selectToggle(btn) {
-    btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  grid.innerHTML =
+    pkgCard('', 'photos-only', p.photoPrice, 'Photos Only', 'badge-standard', 'Photography',
+      'HDR interior & exterior + aerial. 24-hr delivery.',
+      ['HDR Photos','Aerial Included','24hr Delivery'], 0, 0) +
+
+    pkgCard('', 'video-only', p.videoPrice, 'Videography Only', 'badge-standard', 'Videography',
+      'Cinematic listing video + aerial footage. 48-hr delivery.',
+      ['Cinematic Edit','Aerial Included','Licensed Music'], 0, 0) +
+
+    pkgCard('popular', 'photo-video', p.photoVideo, 'Photos + Video Bundle', 'badge-popular', '⭐ Most Popular',
+      'HDR photos & cinematic video in one shoot. Priority delivery.',
+      ['HDR Photos','Cinematic Video','Aerial Included','Priority Delivery'],
+      origPhotoVideo, origPhotoVideo - p.photoVideo) +
+
+    pkgCard('', 'photo-video-floor', p.photoVideoFloor, 'Photos + Video + Floor Plan', 'badge-best', '🏆 Best Value',
+      'Complete listing package. Everything agents need for MLS.',
+      ['HDR Photos','Cinematic Video','Floor Plan','Aerial Included'],
+      origPhotoVideoFloor, origPhotoVideoFloor - p.photoVideoFloor) +
+
+    pkgCard('luxury-card', 'full-estate', p.fullEstate, 'Full Estate Package', 'badge-luxury', '✦ Full Estate',
+      'Photos + Video + Floor Plan + Real Twilight Session. Maximum listing impact.',
+      ['HDR Photos','Cinematic Video','Floor Plan','Twilight Session','Aerial Included'],
+      origFull, origFull - p.fullEstate);
+
+  const tierNames = { standard:'Standard', premium:'Premium', luxury:'Luxury Estate' };
+  document.getElementById('packageSubtext').textContent =
+    tierNames[p.tier] + ' pricing for your ' + parseInt(sqft).toLocaleString() + ' sqft property. All packages include aerial drone photography, subject to FAA airspace availability.';
+}
+
+function selectPackage(card, id, price, name) {
+  document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedPackageId   = id;
+  selectedPackagePrice = price;
+  selectedPackageName  = name;
+  updateTotal();
+}
+
+// ── BUILD ADD-ONS ─────────────────────────────────────────────
+function buildAddons() {
+  const sqft = document.getElementById('sqft').value;
+  const p    = getPricing(sqft);
+  const grid = document.getElementById('addonGrid');
+  const hasVideo   = selectedPackageId && selectedPackageId.includes('video');
+  const hasFloor   = selectedPackageId && selectedPackageId.includes('floor');
+  const hasTwilight = selectedPackageId === 'full-estate';
+
+  const addons = [
+    { name:'Twilight Session',      desc:'Real golden hour + dusk exterior. Time coordinated with you.', price:p.twilightPrice, show:!hasTwilight },
+    { name:'Virtual Twilight ×1',   desc:'AI-generated dusk from daytime photo',                         price:79,  show:true },
+    { name:'Virtual Twilight ×2',   desc:'Two AI-generated dusk images',                                 price:139, show:true },
+    { name:'Virtual Staging ×1',    desc:'Virtually furnish 1 empty room',                               price:79,  show:true },
+    { name:'Virtual Staging ×3',    desc:'Most popular for vacant listings',                             price:189, show:true },
+    { name:'Virtual Staging ×5',    desc:'Full vacant home transformation',                              price:249, show:true },
+    { name:'Floor Plan',            desc:'2D floor plan for MLS — priced to your sqft',                  price:p.floorPrice, show:!hasFloor },
+    { name:'360 Virtual Tour',      desc:'Immersive virtual walkthrough for your listing',               price:p.tourPrice, show:true },
+    { name:'Feature Detail Shots',  desc:'Close-up lifestyle details for luxury & vacation rentals',     price:149, show:true },
+    { name:'Community Area Shots',  desc:'Pool, clubhouse, amenity areas',                               price:99,  show:true },
+    { name:'Grass Addition',        desc:'Virtual grass for dead or patchy lawns',                       price:69,  show:true },
+    { name:'Rush Processing',       desc:'Next morning delivery by 9am',                                 price:149, show:true },
+    { name:'Slideshow Video',       desc:'Branded photo slideshow for social media',                     price:149, show:true },
+    { name:'Branded Video',         desc:'Add your logo, contact info & title cards',                    price:99,  show:hasVideo },
+    { name:'Agent On Camera',       desc:'Professional on-camera presence',                              price:199, show:hasVideo },
+    { name:'Extra Video Minutes',   desc:'Extend final edit beyond standard length',                     price:149, show:hasVideo },
+  ].filter(a => a.show);
+
+  grid.innerHTML = addons.map(a =>
+    '<div class="addon-card" onclick="toggleAddon(this,' + a.price + ')" data-name="' + a.name + '">' +
+      '<div class="addon-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div>' +
+      '<div class="addon-info">' +
+        '<div class="addon-name">' + a.name + '</div>' +
+        '<div class="addon-desc">' + a.desc + '</div>' +
+        '<div class="addon-price">$' + a.price + '</div>' +
+      '</div></div>'
+  ).join('');
+}
+
+function toggleAddon(card, price) {
+  card.classList.toggle('selected');
+  const name = card.dataset.name;
+  if (card.classList.contains('selected')) { addonTotal += price; addonNames.push(name); }
+  else { addonTotal -= price; const i = addonNames.indexOf(name); if (i > -1) addonNames.splice(i, 1); }
+  updateTotal();
+}
+
+// ── TOTAL ─────────────────────────────────────────────────────
+function updateTotal() {
+  const t = selectedPackagePrice + addonTotal;
+  document.getElementById('totalAmount').textContent = '$' + t.toLocaleString('en-US', { minimumFractionDigits: 2 });
+}
+
+// ── VALIDATION ────────────────────────────────────────────────
+function validatePage1() {
+  let valid = true;
+  const checks = [
+    { id:'firstName', err:'err-firstName', fn: v => v.trim() !== '' },
+    { id:'lastName',  err:'err-lastName',  fn: v => v.trim() !== '' },
+    { id:'email',     err:'err-email',     fn: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { id:'phone',     err:'err-phone',     fn: v => v.trim() !== '' },
+    { id:'street',    err:'err-street',    fn: v => v.trim() !== '' },
+    { id:'city',      err:'err-city',      fn: v => v.trim() !== '' },
+    { id:'zip',       err:'err-zip',       fn: v => v.trim() !== '' },
+    { id:'sqft',      err:'err-sqft',      fn: v => parseInt(v) > 0 },
+  ];
+  checks.forEach(c => {
+    const el  = document.getElementById(c.id);
+    const err = document.getElementById(c.err);
+    if (!c.fn(el.value)) { el.classList.add('error'); err.classList.add('show'); valid = false; }
+    else { el.classList.remove('error'); err.classList.remove('show'); }
+  });
+  return valid;
+}
+
+function validatePage4() {
+  let valid = true;
+  const dateVal = document.getElementById('scheduledDate').value;
+  if (!dateVal) {
+    document.getElementById('scheduledDate').classList.add('error');
+    document.getElementById('err-date').classList.add('show');
+    valid = false;
+  } else {
+    document.getElementById('scheduledDate').classList.remove('error');
+    document.getElementById('err-date').classList.remove('show');
   }
+  if (fullyBookedDates.includes(dateVal)) { document.getElementById('dateBookedNote').style.display = 'block'; valid = false; }
+  if (!document.querySelector('.time-slot.selected')) { document.getElementById('err-time').classList.add('show'); valid = false; }
+  else { document.getElementById('err-time').classList.remove('show'); }
+  return valid;
+}
 
-  function selectService(card, service, price) {
-    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    selectedService = service;
-    prices.service = price;
-    updateTotal();
-  }
+// ── NAV ───────────────────────────────────────────────────────
+function nextPage() {
+  if (currentPage === 1) { if (!validatePage1()) return; buildPackages(); }
+  if (currentPage === 2) { if (!selectedPackageId) { alert('Please select a package to continue.'); return; } buildAddons(); }
+  if (currentPage === 4) { if (!validatePage4()) return; populateReview(); }
+  if (currentPage === 5) { submitForm(); return; }
+  showPage(currentPage + 1);
+}
 
-  function selectPricing(option, type, price) {
-    const grid = option.parentElement;
-    grid.querySelectorAll('.pricing-option').forEach(o => o.classList.remove('selected'));
-    option.classList.add('selected');
-    prices[type] = price;
-    updateTotal();
-  }
+function prevPage() { if (currentPage > 1) showPage(currentPage - 1); }
 
-  function toggleAddon(card, price) {
-    card.classList.toggle('selected');
-    const name = card.dataset.name;
-    if (card.classList.contains('selected')) {
-      prices.addons += price;
-      addonNames.push(name);
-    } else {
-      prices.addons -= price;
-      const idx = addonNames.indexOf(name);
-      if (idx > -1) addonNames.splice(idx, 1);
-    }
-    updateTotal();
-  }
-
-  // Fetch booked-out dates on page load
-  let fullyBookedDates = [];
-
-  async function loadAvailability() {
-    try {
-      const res = await fetch('/api/availability');
-      const data = await res.json();
-      fullyBookedDates = data.fullyBooked || [];
-    } catch (e) {
-      fullyBookedDates = [];
-    }
-  }
-
-  function checkDateAvailability(dateVal) {
-    const note = document.getElementById('dateBookedNote');
-    const input = document.getElementById('scheduledDate');
-    if (fullyBookedDates.includes(dateVal)) {
-      note.style.display = 'block';
-      input.style.borderColor = '#e05252';
-    } else {
-      note.style.display = 'none';
-      input.style.borderColor = '#dde0ea';
-    }
-  }
-
-  loadAvailability();
-
-  function selectTime(slot) {
-    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-    slot.classList.add('selected');
-  }
-
-  function getPageSequence() {
-    const seq = [1, 2];
-    if (selectedService === 'photo' || selectedService === 'bundle') seq.push(3);
-    if (selectedService === 'video' || selectedService === 'bundle') seq.push(4);
-    if (selectedService === 'photo' || selectedService === 'bundle') seq.push(5, 6);
-    if (selectedService === 'video' || selectedService === 'bundle') seq.push(7);
-    seq.push(8, 9, 10, 11);
-    return seq;
-  }
-
-  function prevPage() {
-    const seq = getPageSequence();
-    const idx = seq.indexOf(currentPage);
-    if (idx > 0) showPage(seq[idx - 1]);
-  }
-
-  function populateReview() {
-    const firstName = document.getElementById('firstName').value;
-    const lastName  = document.getElementById('lastName').value;
-    const email     = document.getElementById('email').value;
-    const phone     = document.getElementById('phone').value;
-    const street    = document.getElementById('street').value;
-    const city      = document.getElementById('city').value;
-    const zip       = document.getElementById('zip').value;
-
-    document.getElementById('reviewName').textContent    = (firstName + ' ' + lastName).trim() || '—';
-    document.getElementById('reviewEmail').textContent   = email || '—';
-    document.getElementById('reviewPhone').textContent   = phone || '—';
-    document.getElementById('reviewAddress').textContent = [street, city, zip].filter(Boolean).join(', ') || '—';
-
-    const serviceCard = document.querySelector('.service-card.selected');
-    document.getElementById('reviewServiceName').textContent  = serviceCard ? serviceCard.querySelector('.service-name').textContent : '—';
-    document.getElementById('reviewPhotoPrice').textContent   = prices.photo   ? '$' + prices.photo   : '—';
-    document.getElementById('reviewVideoPrice').textContent   = prices.video   ? '$' + prices.video   : '—';
-    document.getElementById('reviewStagingPrice').textContent = prices.staging ? '$' + prices.staging : '—';
-    document.getElementById('reviewFloorPrice').textContent   = prices.floor   ? '$' + prices.floor   : '—';
-    document.getElementById('reviewTourPrice').textContent    = prices.tour    ? '$' + prices.tour    : '—';
-    document.getElementById('reviewAddons').textContent       = addonNames.length ? addonNames.join(', ') + ' ($' + prices.addons + ')' : 'None';
-  }
-
-  function showPage(num) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page' + num).classList.add('active');
-    currentPage = num;
-    buildProgress();
-    updateNavButtons();
-    if (num === 11) populateReview();
-    window.scrollTo(0, 0);
-  }
-
-  function showSuccess() {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('pageSuccess').classList.add('active');
-    document.getElementById('formNav').style.display = 'none';
-    document.getElementById('progressDots').innerHTML = '';
-  }
-
-  function updateNavButtons() {
-    const seq = getPageSequence();
-    const idx = seq.indexOf(currentPage);
-    const backBtn = document.getElementById('btnBack');
-    const nextBtn = document.getElementById('btnNext');
-
-    backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-
-    if (currentPage === 11) {
-      nextBtn.textContent = 'Submit Booking';
-      nextBtn.className = 'btn-submit';
-    } else {
-      nextBtn.textContent = 'Continue →';
-      nextBtn.className = 'btn-next';
-    }
-
-    const pageNumEl = document.querySelector('#page' + currentPage + ' .page-num');
-    if (pageNumEl && currentPage !== 11) {
-      pageNumEl.textContent = 'Step ' + (idx + 1) + ' of ' + seq.length;
-    }
-  }
-
-  async function submitForm() {
-    const btnNext = document.getElementById('btnNext');
-    btnNext.textContent = 'Sending...';
-    btnNext.disabled = true;
-
-    const firstName   = document.getElementById('firstName').value.trim();
-    const lastName    = document.getElementById('lastName').value.trim();
-    const email       = document.getElementById('email').value.trim();
-    const phone       = document.getElementById('phone').value.trim();
-    const street      = document.getElementById('street').value.trim();
-    const city        = document.getElementById('city').value.trim();
-    const zip         = document.getElementById('zip').value.trim();
-    const sqft        = document.getElementById('sqft').value.trim();
-    const scheduledDate = document.getElementById('scheduledDate').value;
-    const specialNotes  = document.getElementById('specialNotes').value.trim();
-
-    const attendingBtn = document.querySelector('.toggle-btn.active');
-    const attending = attendingBtn ? attendingBtn.textContent.trim() : 'Not specified';
-
-    const accessNotes = document.getElementById('accessNotes').value.trim();
-    const doorCode    = document.getElementById('doorCode').value.trim();
-    const gateCode    = document.getElementById('gateCode').value.trim();
-    const comboCode   = document.getElementById('comboCode').value.trim();
-
-    const isTwilight  = false; // removed — Cesar coordinates twilight times manually
-
-    const serviceCard = document.querySelector('.service-card.selected');
-    const service = serviceCard ? serviceCard.querySelector('.service-name').textContent : 'Not selected';
-
-    const timeSlot = document.querySelector('.time-slot.selected');
-    const scheduledTime = timeSlot ? timeSlot.dataset.time : 'Not selected';
-
-    const grandTotal = Object.values(prices).reduce((a, b) => a + b, 0);
-
-    const payload = {
-      firstName, lastName, email, phone,
-      street, city, zip, attending, accessNotes,
-      service,
-      photoPrice:   prices.photo,
-      videoPrice:   prices.video,
-      stagingPrice: prices.staging,
-      floorPrice:   prices.floor,
-      tourPrice:    prices.tour,
-      addons:       addonNames.join(', '),
-      addonTotal:   prices.addons,
-      scheduledDate, scheduledTime, specialNotes,
-      grandTotal,
-      doorCode, gateCode, comboCode, sqft
-    };
-
-    try {
-      const res = await fetch('/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok) {
-        showSuccess();
-      } else {
-        throw new Error('Server error');
-      }
-    } catch (err) {
-      btnNext.textContent = 'Submit Booking';
-      btnNext.disabled = false;
-      alert('Something went wrong. Please email us directly at cesar@imagestate.homes or call us to complete your booking.');
-    }
-  }
-
-  function nextPage() {
-    const seq = getPageSequence();
-    const idx = seq.indexOf(currentPage);
-    if (currentPage === 11) {
-      submitForm();
-      return;
-    }
-    // Block progression if selected date is fully booked
-    if (currentPage === 10) {
-      const dateVal = document.getElementById('scheduledDate').value;
-      if (dateVal && fullyBookedDates.includes(dateVal)) {
-        document.getElementById('dateBookedNote').style.display = 'block';
-        return;
-      }
-    }
-    if (idx < seq.length - 1) {
-      showPage(seq[idx + 1]);
-    }
-  }
-
+function showPage(num) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page' + num).classList.add('active');
+  currentPage = num;
   buildProgress();
   updateNavButtons();
-  updateTotal();
+  window.scrollTo(0, 0);
+}
+
+function buildProgress() {
+  const wrap = document.getElementById('progressDots');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= TOTAL_PAGES; i++) {
+    const d = document.createElement('div');
+    d.className = 'progress-step' + (i === currentPage ? ' active' : i < currentPage ? ' done' : '');
+    wrap.appendChild(d);
+  }
+}
+
+function updateNavButtons() {
+  document.getElementById('btnBack').style.visibility = currentPage === 1 ? 'hidden' : 'visible';
+  const n = document.getElementById('btnNext');
+  if (currentPage === 5) { n.textContent = 'Submit Booking'; n.className = 'btn-submit'; }
+  else { n.textContent = 'Continue →'; n.className = 'btn-next'; }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function selectToggle(btn) { btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+function selectTime(slot) { document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected')); slot.classList.add('selected'); }
+function checkDateAvailability(v) {
+  const note = document.getElementById('dateBookedNote');
+  const input = document.getElementById('scheduledDate');
+  if (fullyBookedDates.includes(v)) { note.style.display='block'; input.style.borderColor='var(--error)'; }
+  else { note.style.display='none'; input.style.borderColor='#dde0ea'; }
+}
+async function loadAvailability() {
+  try { const r = await fetch('/api/availability'); const d = await r.json(); fullyBookedDates = d.fullyBooked || []; }
+  catch(e) { fullyBookedDates = []; }
+}
+
+// ── REVIEW ────────────────────────────────────────────────────
+function populateReview() {
+  const g = id => document.getElementById(id).value;
+  const timeSlot = document.querySelector('.time-slot.selected');
+  document.getElementById('rName').textContent        = (g('firstName') + ' ' + g('lastName')).trim();
+  document.getElementById('rEmail').textContent       = g('email');
+  document.getElementById('rPhone').textContent       = g('phone');
+  document.getElementById('rAddress').textContent     = g('street') + ', ' + g('city') + ', CA ' + g('zip');
+  document.getElementById('rSqft').textContent        = parseInt(g('sqft')).toLocaleString() + ' sqft';
+  document.getElementById('rPackage').textContent     = selectedPackageName;
+  document.getElementById('rPackagePrice').textContent = '$' + selectedPackagePrice.toLocaleString();
+  document.getElementById('rAddons').textContent      = addonNames.length ? addonNames.join(', ') + ' (+$' + addonTotal + ')' : 'None';
+  document.getElementById('rDate').textContent        = g('scheduledDate');
+  document.getElementById('rTime').textContent        = timeSlot ? timeSlot.dataset.time : '—';
+  document.getElementById('rNotes').textContent       = g('specialNotes') || 'None';
+  document.getElementById('rTotal').textContent       = '$' + (selectedPackagePrice + addonTotal).toLocaleString();
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+async function submitForm() {
+  const btn = document.getElementById('btnNext');
+  btn.textContent = 'Sending...'; btn.disabled = true;
+
+  const g   = id => document.getElementById(id).value.trim();
+  const sqft = g('sqft');
+  const p   = getPricing(sqft);
+  const timeSlot = document.querySelector('.time-slot.selected');
+  const attending = (document.querySelector('.toggle-btn.active') || {}).textContent || 'Yes';
+
+  let photoPrice=0, videoPrice=0, floorPrice=0;
+  if (selectedPackageId==='photos-only')       { photoPrice=p.photoPrice; }
+  if (selectedPackageId==='video-only')        { videoPrice=p.videoPrice; }
+  if (selectedPackageId==='photo-video')       { photoPrice=p.photoPrice; videoPrice=p.videoPrice; }
+  if (selectedPackageId==='photo-video-floor') { photoPrice=p.photoPrice; videoPrice=p.videoPrice; floorPrice=p.floorPrice; }
+  if (selectedPackageId==='full-estate')       { photoPrice=p.photoPrice; videoPrice=p.videoPrice; floorPrice=p.floorPrice; }
+
+  const payload = {
+    firstName:g('firstName'), lastName:g('lastName'), email:g('email'), phone:g('phone'),
+    street:g('street'), city:g('city'), zip:g('zip'), attending, accessNotes:g('accessNotes'),
+    service: selectedPackageName,
+    photoPrice, videoPrice, stagingPrice:0, floorPrice, tourPrice:0,
+    addons: addonNames.join(', '), addonTotal,
+    scheduledDate: document.getElementById('scheduledDate').value,
+    scheduledTime: timeSlot ? timeSlot.dataset.time : 'Not selected',
+    specialNotes: document.getElementById('specialNotes').value.trim(),
+    grandTotal: selectedPackagePrice + addonTotal,
+    doorCode:g('doorCode'), gateCode:g('gateCode'), comboCode:g('comboCode'), sqft,
+    packageId: selectedPackageId, packagePrice: selectedPackagePrice, isTwilight: false
+  };
+
+  try {
+    const res = await fetch('/api/submit', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    if (res.ok) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('pageSuccess').classList.add('active');
+      document.getElementById('formNav').style.display = 'none';
+      document.getElementById('progressDots').innerHTML = '';
+    } else throw new Error('error');
+  } catch(e) {
+    btn.textContent = 'Submit Booking'; btn.disabled = false;
+    alert('Something went wrong. Please email cesar@imagestate.homes or call us directly.');
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+buildProgress();
+updateNavButtons();
+loadAvailability();
 </script>
 </body>
 </html>

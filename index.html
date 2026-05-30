@@ -7,16 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #1a1f3a;
-    --navy-light: #252b4a;
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --cream: #f8f6f1;
+    --navy: #042752;
+    --navy-light: #063a7a;
+    --gold: #00a896;
+    --gold-light: #00c9b1;
+    --cream: #f4f6f9;
     --white: #ffffff;
-    --gray: #9a9fb0;
-    --gray-light: #eef0f5;
-    --text: #1a1f3a;
-    --success: #4a7c59;
+    --gray: #8a95a8;
+    --gray-light: #eef1f6;
+    --text: #042752;
+    --success: #00a896;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -513,7 +513,7 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 15px;
     font-weight: 500;
-    color: var(--navy);
+    color: var(--white);
     cursor: pointer;
     transition: all 0.2s;
   }
@@ -628,12 +628,7 @@
 <!-- HEADER -->
 <div class="form-header">
   <div class="logo">
-    <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
-      <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="1.5"/>
-      <path d="M10 18 L18 10 L26 18 L18 26 Z" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
-      <circle cx="18" cy="18" r="4" fill="#c9a84c"/>
-    </svg>
-    <span class="logo-text">IMAGESTATE</span>
+    <img src="https://cdn.durable.co/blocks/9V6s7Y5zhAZ9XIsFWyvmg1Z4FkbzHEsfxH0pZFebAq9V40gdF8gxV7QXHCiv4d4j.png" alt="IMAGESTATE" style="height:36px;width:auto;">
   </div>
   <div class="progress-wrap" id="progressDots"></div>
 </div>
@@ -654,22 +649,22 @@
     <div class="field-row">
       <div class="field-group">
         <label class="field-label">First Name *</label>
-        <input class="field-input" type="text" placeholder="Jane">
+        <input class="field-input" id="firstName" type="text" placeholder="Jane">
       </div>
       <div class="field-group">
         <label class="field-label">Last Name *</label>
-        <input class="field-input" type="text" placeholder="Smith">
+        <input class="field-input" id="lastName" type="text" placeholder="Smith">
       </div>
     </div>
 
     <div class="field-group">
       <label class="field-label">Email Address *</label>
-      <input class="field-input" type="email" placeholder="jane@realty.com">
+      <input class="field-input" id="email" type="email" placeholder="jane@realty.com">
     </div>
 
     <div class="field-group">
       <label class="field-label">Phone Number *</label>
-      <input class="field-input" type="tel" placeholder="(760) 555-0100">
+      <input class="field-input" id="phone" type="tel" placeholder="(760) 555-0100">
     </div>
 
     <div class="section-divider">
@@ -680,23 +675,23 @@
 
     <div class="field-group">
       <label class="field-label">Listing Street Address *</label>
-      <input class="field-input" type="text" placeholder="123 Desert Rose Drive">
+      <input class="field-input" id="street" type="text" placeholder="123 Desert Rose Drive">
     </div>
 
     <div class="field-row">
       <div class="field-group">
         <label class="field-label">City *</label>
-        <input class="field-input" type="text" placeholder="Palm Springs">
+        <input class="field-input" id="city" type="text" placeholder="Palm Springs">
       </div>
       <div class="field-group">
         <label class="field-label">Zip Code *</label>
-        <input class="field-input" type="text" placeholder="92262">
+        <input class="field-input" id="zip" type="text" placeholder="92262">
       </div>
     </div>
 
     <div class="field-group">
       <label class="field-label">Approximate Square Footage *</label>
-      <input class="field-input" type="text" placeholder="e.g. 3,200">
+      <input class="field-input" id="sqft" type="text" placeholder="e.g. 3,200">
     </div>
 
     <div class="field-group">
@@ -709,7 +704,7 @@
 
     <div class="field-group">
       <label class="field-label">Gate Code / Access Instructions</label>
-      <input class="field-input" type="text" placeholder="Gate code, lockbox, key location...">
+      <input class="field-input" id="accessNotes" type="text" placeholder="Gate code, lockbox, key location...">
     </div>
   </div>
 </div>
@@ -1316,7 +1311,7 @@
 
     <div class="field-group">
       <label class="field-label">Preferred Date *</label>
-      <input class="field-input" type="date">
+      <input class="field-input" id="scheduledDate" type="date">
     </div>
 
     <div class="field-group">
@@ -1336,7 +1331,7 @@
 
     <div class="field-group">
       <label class="field-label">Special Accommodations</label>
-      <textarea class="field-input" rows="4" placeholder="Any special instructions, preparation notes, or requests for your shoot..."></textarea>
+      <textarea class="field-input" id="specialNotes" rows="4" placeholder="Any special instructions, preparation notes, or requests for your shoot..."></textarea>
     </div>
   </div>
 </div>
@@ -1350,10 +1345,10 @@
 
     <div class="review-section" id="reviewContact">
       <div class="review-section-title">Contact & Property</div>
-      <div class="review-line"><span class="review-line-label">Name</span><span class="review-line-value">—</span></div>
-      <div class="review-line"><span class="review-line-label">Email</span><span class="review-line-value">—</span></div>
-      <div class="review-line"><span class="review-line-label">Phone</span><span class="review-line-value">—</span></div>
-      <div class="review-line"><span class="review-line-label">Address</span><span class="review-line-value">—</span></div>
+      <div class="review-line"><span class="review-line-label">Name</span><span class="review-line-value" id="reviewName">—</span></div>
+      <div class="review-line"><span class="review-line-label">Email</span><span class="review-line-value" id="reviewEmail">—</span></div>
+      <div class="review-line"><span class="review-line-label">Phone</span><span class="review-line-value" id="reviewPhone">—</span></div>
+      <div class="review-line"><span class="review-line-label">Address</span><span class="review-line-value" id="reviewAddress">—</span></div>
     </div>
 
     <div class="review-section" id="reviewServices">
@@ -1481,12 +1476,34 @@
     return seq;
   }
 
-
-
   function prevPage() {
     const seq = getPageSequence();
     const idx = seq.indexOf(currentPage);
     if (idx > 0) showPage(seq[idx - 1]);
+  }
+
+  function populateReview() {
+    const firstName = document.getElementById('firstName').value;
+    const lastName  = document.getElementById('lastName').value;
+    const email     = document.getElementById('email').value;
+    const phone     = document.getElementById('phone').value;
+    const street    = document.getElementById('street').value;
+    const city      = document.getElementById('city').value;
+    const zip       = document.getElementById('zip').value;
+
+    document.getElementById('reviewName').textContent    = (firstName + ' ' + lastName).trim() || '—';
+    document.getElementById('reviewEmail').textContent   = email || '—';
+    document.getElementById('reviewPhone').textContent   = phone || '—';
+    document.getElementById('reviewAddress').textContent = [street, city, zip].filter(Boolean).join(', ') || '—';
+
+    const serviceCard = document.querySelector('.service-card.selected');
+    document.getElementById('reviewServiceName').textContent  = serviceCard ? serviceCard.querySelector('.service-name').textContent : '—';
+    document.getElementById('reviewPhotoPrice').textContent   = prices.photo   ? '$' + prices.photo   : '—';
+    document.getElementById('reviewVideoPrice').textContent   = prices.video   ? '$' + prices.video   : '—';
+    document.getElementById('reviewStagingPrice').textContent = prices.staging ? '$' + prices.staging : '—';
+    document.getElementById('reviewFloorPrice').textContent   = prices.floor   ? '$' + prices.floor   : '—';
+    document.getElementById('reviewTourPrice').textContent    = prices.tour    ? '$' + prices.tour    : '—';
+    document.getElementById('reviewAddons').textContent       = addonNames.length ? addonNames.join(', ') + ' ($' + prices.addons + ')' : 'None';
   }
 
   function showPage(num) {
@@ -1495,6 +1512,7 @@
     currentPage = num;
     buildProgress();
     updateNavButtons();
+    if (num === 11) populateReview();
     window.scrollTo(0, 0);
   }
 
@@ -1521,18 +1539,10 @@
       nextBtn.className = 'btn-next';
     }
 
-    // Update page num labels
     const pageNumEl = document.querySelector('#page' + currentPage + ' .page-num');
     if (pageNumEl && currentPage !== 11) {
       pageNumEl.textContent = 'Step ' + (idx + 1) + ' of ' + seq.length;
     }
-  }
-
-  // ── FORM SUBMISSION ──────────────────────────────────────────
-
-  function getFieldValue(selector) {
-    const el = document.querySelector(selector);
-    return el ? el.value : '';
   }
 
   async function submitForm() {
@@ -1540,52 +1550,40 @@
     btnNext.textContent = 'Sending...';
     btnNext.disabled = true;
 
-    // Collect contact fields
-    const inputs = document.querySelectorAll('.field-input');
-    const firstName = inputs[0] ? inputs[0].value : '';
-    const lastName  = inputs[1] ? inputs[1].value : '';
-    const email     = inputs[2] ? inputs[2].value : '';
-    const phone     = inputs[3] ? inputs[3].value : '';
-    const street    = inputs[4] ? inputs[4].value : '';
-    const city      = inputs[5] ? inputs[5].value : '';
-    const zip       = inputs[6] ? inputs[6].value : '';
+    const firstName   = document.getElementById('firstName').value.trim();
+    const lastName    = document.getElementById('lastName').value.trim();
+    const email       = document.getElementById('email').value.trim();
+    const phone       = document.getElementById('phone').value.trim();
+    const street      = document.getElementById('street').value.trim();
+    const city        = document.getElementById('city').value.trim();
+    const zip         = document.getElementById('zip').value.trim();
+    const scheduledDate = document.getElementById('scheduledDate').value;
+    const specialNotes  = document.getElementById('specialNotes').value.trim();
 
-    // Attending toggle
     const attendingBtn = document.querySelector('.toggle-btn.active');
-    const attending = attendingBtn ? attendingBtn.textContent : 'Not specified';
+    const attending = attendingBtn ? attendingBtn.textContent.trim() : 'Not specified';
 
-    // Access notes
-    const accessNotes = inputs[7] ? inputs[7].value : '';
+    const accessNotes = document.getElementById('accessNotes').value.trim();
 
-    // Service
     const serviceCard = document.querySelector('.service-card.selected');
     const service = serviceCard ? serviceCard.querySelector('.service-name').textContent : 'Not selected';
 
-    // Schedule
-    const dateInput = document.querySelector('input[type="date"]');
-    const scheduledDate = dateInput ? dateInput.value : '';
     const timeSlot = document.querySelector('.time-slot.selected');
-    const scheduledTime = timeSlot ? timeSlot.textContent : 'Not selected';
+    const scheduledTime = timeSlot ? timeSlot.textContent.trim() : 'Not selected';
 
-    // Special notes
-    const textarea = document.querySelector('textarea');
-    const specialNotes = textarea ? textarea.value : '';
-
-    // Grand total
-    const totalEl = document.getElementById('totalAmount');
-    const grandTotal = totalEl ? totalEl.textContent.replace('$','').replace(',','') : '0';
+    const grandTotal = Object.values(prices).reduce((a, b) => a + b, 0);
 
     const payload = {
       firstName, lastName, email, phone,
       street, city, zip, attending, accessNotes,
       service,
-      photoPrice: prices.photo || 0,
-      videoPrice: prices.video || 0,
-      stagingPrice: prices.staging || 0,
-      floorPrice: prices.floor || 0,
-      tourPrice: prices.tour || 0,
-      addons: addonNames.join(', '),
-      addonTotal: prices.addons || 0,
+      photoPrice:   prices.photo,
+      videoPrice:   prices.video,
+      stagingPrice: prices.staging,
+      floorPrice:   prices.floor,
+      tourPrice:    prices.tour,
+      addons:       addonNames.join(', '),
+      addonTotal:   prices.addons,
       scheduledDate, scheduledTime, specialNotes,
       grandTotal
     };
@@ -1621,60 +1619,7 @@
     }
   }
 
-  async function submitForm() {
-    const btnNext = document.getElementById('btnNext');
-    btnNext.textContent = 'Sending...';
-    btnNext.disabled = true;
-    const inputs = document.querySelectorAll('.field-input');
-    const firstName = inputs[0] ? inputs[0].value : '';
-    const lastName  = inputs[1] ? inputs[1].value : '';
-    const email     = inputs[2] ? inputs[2].value : '';
-    const phone     = inputs[3] ? inputs[3].value : '';
-    const street    = inputs[4] ? inputs[4].value : '';
-    const city      = inputs[5] ? inputs[5].value : '';
-    const zip       = inputs[6] ? inputs[6].value : '';
-    const attendingBtn = document.querySelector('.toggle-btn.active');
-    const attending = attendingBtn ? attendingBtn.textContent : 'Not specified';
-    const accessNotes = inputs[7] ? inputs[7].value : '';
-    const serviceCard = document.querySelector('.service-card.selected');
-    const service = serviceCard ? serviceCard.querySelector('.service-name').textContent : 'Not selected';
-    const dateInput = document.querySelector('input[type="date"]');
-    const scheduledDate = dateInput ? dateInput.value : '';
-    const timeSlot = document.querySelector('.time-slot.selected');
-    const scheduledTime = timeSlot ? timeSlot.textContent : 'Not selected';
-    const textarea = document.querySelector('textarea');
-    const specialNotes = textarea ? textarea.value : '';
-    const totalEl = document.getElementById('totalAmount');
-    const grandTotal = totalEl ? totalEl.textContent.replace('$','').replace(',','') : '0';
-    const payload = {
-      firstName, lastName, email, phone,
-      street, city, zip, attending, accessNotes, service,
-      photoPrice: prices.photo || 0,
-      videoPrice: prices.video || 0,
-      stagingPrice: prices.staging || 0,
-      floorPrice: prices.floor || 0,
-      tourPrice: prices.tour || 0,
-      addons: addonNames.join(', '),
-      addonTotal: prices.addons || 0,
-      scheduledDate, scheduledTime, specialNotes, grandTotal
-    };
-    try {
-      const res = await fetch('/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) { showSuccess(); } 
-      else { throw new Error('Server error'); }
-    } catch (err) {
-      btnNext.textContent = 'Submit Booking';
-      btnNext.disabled = false;
-      alert('Something went wrong. Please email cesar@imagestate.homes to complete your booking.');
-    }
-  }
-
- 
-  }buildProgress();
+  buildProgress();
   updateNavButtons();
   updateTotal();
 </script>

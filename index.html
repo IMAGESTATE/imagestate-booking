@@ -26,9 +26,9 @@
   .progress-step.active { background: var(--gold); transform: scale(1.3); }
   .progress-step.done { background: rgba(0,168,150,0.5); }
 
-  .total-bar { background: var(--navy-light); padding: 10px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,168,150,0.2); }
-  .total-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
-  .total-amount { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; color: var(--gold); }
+  .total-bar { background: var(--navy-light); padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(0,168,150,0.3); position: sticky; top: 74px; z-index: 99; box-shadow: 0 2px 8px rgba(4,39,82,0.2); }
+  .total-label { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 500; }
+  .total-amount { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--white); }
 
   .page { display: none; animation: fadeUp 0.35s ease; }
   .page.active { display: block; }
@@ -801,6 +801,10 @@ async function submitForm() {
       document.getElementById('pageSuccess').classList.add('active');
       document.getElementById('formNav').style.display = 'none';
       document.getElementById('progressDots').innerHTML = '';
+    } else if (res.status === 409) {
+      const data = await res.json();
+      btn.textContent = 'Submit Booking'; btn.disabled = false;
+      alert(data.error || 'This time slot is no longer available. Please go back and select a different time.');
     } else throw new Error('error');
   } catch(e) {
     btn.textContent = 'Submit Booking'; btn.disabled = false;
